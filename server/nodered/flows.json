@@ -1,0 +1,330 @@
+[
+    {
+        "id": "96cdfc911e5f30a8",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "de24aff89ea8a24b",
+        "type": "mqtt-broker",
+        "name": "MQTT Broker",
+        "broker": "mosquitto",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "0db0cb69f56aadc7",
+        "type": "mqtt in",
+        "z": "96cdfc911e5f30a8",
+        "name": "",
+        "topic": "home/th",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "de24aff89ea8a24b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 100,
+        "y": 60,
+        "wires": [
+            [
+                "f766d64a5545da63",
+                "9d44ec2f582d53a5",
+                "fca26e21852167cb"
+            ]
+        ]
+    },
+    {
+        "id": "5d321798d18b6c33",
+        "type": "mqtt in",
+        "z": "96cdfc911e5f30a8",
+        "name": "",
+        "topic": "home/thp",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "de24aff89ea8a24b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 100,
+        "y": 120,
+        "wires": [
+            [
+                "2e9eb97c1e75e9f5",
+                "f766d64a5545da63",
+                "9d44ec2f582d53a5",
+                "fca26e21852167cb"
+            ]
+        ]
+    },
+    {
+        "id": "97155ac060c75394",
+        "type": "mqtt in",
+        "z": "96cdfc911e5f30a8",
+        "name": "",
+        "topic": "home/thpb",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "de24aff89ea8a24b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 100,
+        "y": 180,
+        "wires": [
+            [
+                "efa5c278037d8c3c",
+                "2e9eb97c1e75e9f5",
+                "f766d64a5545da63",
+                "9d44ec2f582d53a5",
+                "fca26e21852167cb"
+            ]
+        ]
+    },
+    {
+        "id": "e4bcacc3334c7edb",
+        "type": "mqtt in",
+        "z": "96cdfc911e5f30a8",
+        "name": "",
+        "topic": "Testing",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "de24aff89ea8a24b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 90,
+        "y": 240,
+        "wires": [
+            [
+                "fca26e21852167cb"
+            ]
+        ]
+    },
+    {
+        "id": "9d44ec2f582d53a5",
+        "type": "change",
+        "z": "96cdfc911e5f30a8",
+        "name": "Temperature",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"value\":msg.payload.t\t    },\t   {\t        \"id\":msg.payload.m\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 450,
+        "y": 60,
+        "wires": [
+            [
+                "3dcf579ac1a09e17"
+            ]
+        ]
+    },
+    {
+        "id": "f766d64a5545da63",
+        "type": "change",
+        "z": "96cdfc911e5f30a8",
+        "name": "Humidity",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"value\":msg.payload.h\t    },\t   {\t        \"id\":msg.payload.m\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 440,
+        "y": 100,
+        "wires": [
+            [
+                "9ed5169014441026"
+            ]
+        ]
+    },
+    {
+        "id": "2e9eb97c1e75e9f5",
+        "type": "change",
+        "z": "96cdfc911e5f30a8",
+        "name": "Pressure",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"value\":msg.payload.b\t    },\t   {\t        \"id\":msg.payload.m\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 440,
+        "y": 140,
+        "wires": [
+            [
+                "beb5e0ccdab79f3a"
+            ]
+        ]
+    },
+    {
+        "id": "efa5c278037d8c3c",
+        "type": "change",
+        "z": "96cdfc911e5f30a8",
+        "name": "Battery Voltage",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"value\":msg.payload.v\t    },\t   {\t        \"id\":msg.payload.m\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 460,
+        "y": 180,
+        "wires": [
+            [
+                "107800ab4f5f7059"
+            ]
+        ]
+    },
+    {
+        "id": "fca26e21852167cb",
+        "type": "debug",
+        "z": "96cdfc911e5f30a8",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 440,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "3dcf579ac1a09e17",
+        "type": "influxdb out",
+        "z": "96cdfc911e5f30a8",
+        "influxdb": "",
+        "name": "InfluxDB/temperature",
+        "measurement": "temperature",
+        "precision": "s",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "organisation",
+        "bucket": "bucket",
+        "x": 740,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "9ed5169014441026",
+        "type": "influxdb out",
+        "z": "96cdfc911e5f30a8",
+        "influxdb": "",
+        "name": "InfluxDB/humidity",
+        "measurement": "humidity",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "organisation",
+        "bucket": "bucket",
+        "x": 730,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "beb5e0ccdab79f3a",
+        "type": "influxdb out",
+        "z": "96cdfc911e5f30a8",
+        "influxdb": "",
+        "name": "InfluxDB/pressure",
+        "measurement": "pressure",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "organisation",
+        "bucket": "bucket",
+        "x": 730,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "107800ab4f5f7059",
+        "type": "influxdb out",
+        "z": "96cdfc911e5f30a8",
+        "influxdb": "",
+        "name": "InfluxDB/batteryVoltage",
+        "measurement": "batteryVoltage",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "organisation",
+        "bucket": "bucket",
+        "x": 750,
+        "y": 180,
+        "wires": []
+    }
+]
