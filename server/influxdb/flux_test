@@ -1,8 +1,0 @@
-from(bucket: "sensors")
-    |> range(start: -1d)
-    |> filter(fn: (r) => r._measurement == "airTemperature")
-    |> aggregateWindow(
-        every: 1m,
-        fn: mean
-    )
-    |> yield(name: "_results")
