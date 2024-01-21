@@ -22,7 +22,7 @@ do
 	T=$(($(($RANDOM%$DIFFT))+$TempL))
 	H=$(($(($RANDOM%$DIFFH))+$HumL))
 	B=$(($(($RANDOM%$DIFFB))+$PressL))
-	mosquitto_pub -u dp -P Valasek_Maros -t "home/thp" -m {'"m"':'"'$id'"'", "'"t"':$T", "'"h"':$H", "'"b"':$B}
+	mosquitto_pub -h 192.168.1.250 -u dp -P Valasek_Maros -t "home/thp" -m {'"m"':'"'$id'"'", "'"t"':$T", "'"h"':$H", "'"b"':$B}
 	sleep $SLEEP
 done
 
