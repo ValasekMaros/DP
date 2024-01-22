@@ -1,0 +1,50 @@
+name: project-iot
+version: "0.1"
+services:
+  mosquitto:
+    image: eclipse-mosquitto
+    container_name: mosquitto
+    volumes:
+      - /home/dp/project/mosquitto:/mosquitto
+    ports:
+      - 1883:1883
+    restart: unless-stopped
+    networks:
+      - iot
+
+  nodered:
+    image: nodered/node-red
+    container_name: nodered
+    volumes:
+      - /home/dp/project/nodered:/data
+    ports:
+      - 1880:1880
+    restart: unless-stopped
+    networks:
+      -  iot
+
+  influxdb:
+    image: influxdb
+    container_name: influxdb
+    volumes:
+      - /home/dp/project/influxdb:/var/lib/influxdb2
+    ports:
+      - 8086:8086
+    restart: unless-stopped
+    networks:
+      - iot
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    user: root
+    volumes:
+      - /home/dp/project/grafana:/var/lib/grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    networks:
+      - iot
+
+networks:
+  iot:
