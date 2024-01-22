@@ -1,2 +1,2 @@
 # DP
-This will be my Diploma Project
+This will be project for my Thesis
