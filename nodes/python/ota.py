@@ -1,4 +1,3 @@
-import network
 import urequests
 import os
 import json
@@ -7,14 +6,12 @@ from time import sleep
 
 class OTAUpdater:
     """ This class handles OTA updates. It connects to the Wi-Fi, checks for updates, downloads and installs them."""
-    def __init__(self, ssid, password, repo_url, filename):
+    def __init__(self, repo_url, filename):
         self.filename = filename
-        self.ssid = ssid
-        self.password = password
         self.repo_url = repo_url
 
-        # self.version_url = repo_url + 'main/version.json'                 # Replacement of the version mechanism by Github's oid
-        self.version_url = self.process_version_url(repo_url, filename)     # Process the new version url
+        self.version_url = repo_url + 'version.json'                 # Replacement of the version mechanism by Github's oid
+        # self.version_url = self.process_version_url(repo_url, filename)     # Process the new version url
         self.firmware_url = repo_url + filename                             # Removal of the 'main' branch to allow different sources
 
         # get the current version (stored in version.json)
@@ -40,17 +37,6 @@ class OTAUpdater:
         version_url = version_url + filename                                       # Add the targeted filename
         
         return version_url
-
-    def connect_wifi(self):
-        """ Connect to Wi-Fi."""
-
-        sta_if = network.WLAN(network.STA_IF)
-        sta_if.active(True)
-        sta_if.connect(self.ssid, self.password)
-        while not sta_if.isconnected():
-            print('.', end="")
-            sleep(0.25)
-        print(f'Connected to WiFi, IP is: {sta_if.ifconfig()[0]}')
         
     def fetch_latest_code(self)->bool:
         """ Fetch the latest code from the repo, returns False if not found."""
@@ -68,10 +54,11 @@ class OTAUpdater:
             print('Firmware not found.')
             return False
 
-    def update_no_reset(self):
-        """ Update the code without resetting the device."""
+    def update_and_reset(self):
+        """ Update the code and reset the device."""
 
-        # Save the fetched code and update the version file to latest version.
+        print('Updating device...', end='')
+
         with open('latest_code.py', 'w') as f:
             f.write(self.latest_code)
         
@@ -86,26 +73,15 @@ class OTAUpdater:
         self.latest_code = None
 
         # Overwrite the old code.
-        os.rename('latest_code.py', self.filename)
-
-    def update_and_reset(self):
-        """ Update the code and reset the device."""
-
-        print('Updating device...', end='')
-
-        # Overwrite the old code.
-        os.rename('latest_code.py', self.filename)  
+        os.rename('latest_code.py', self.filename) 
 
         # Restart the device to run the new code.
         print("Restarting device... (don't worry about an error message after this")
-        sleep(0.25)
+        sleep(0.5)
         machine.reset()  # Reset the device to run the new code.
         
     def check_for_updates(self):
         """ Check if updates are available."""
-        
-        # Connect to Wi-Fi
-        self.connect_wifi()
 
         print('Checking for latest version...')
         headers = {"accept": "application/json"} 
@@ -113,7 +89,7 @@ class OTAUpdater:
         
         data = json.loads(response.text)
        
-        self.latest_version = data['oid']                   # Access directly the id managed by GitHub
+        self.latest_version = data["version"]                # Access directly the id managed by GitHub
         print(f'latest version is: {self.latest_version}')
         
         # compare versions
@@ -126,7 +102,6 @@ class OTAUpdater:
         """ Check for updates, download and install them."""
         if self.check_for_updates():
             if self.fetch_latest_code():
-                self.update_no_reset()
                 self.update_and_reset()
         else:
             print('No new updates available.')
