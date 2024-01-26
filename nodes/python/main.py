@@ -8,3 +8,4 @@ for i in range(16):
     time.sleep(0.1)
     led.off()
     time.sleep(0.1)
+machine.reset()
