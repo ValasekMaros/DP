@@ -1,9 +1,12 @@
-from machine import Pin
+import machine
 import time
 
-led = Pin(2, Pin.OUT)
+led = machine.Pin(2, machine.Pin.OUT)
+
 for i in range(4):
     led.on()
     time.sleep(1)
     led.off()
     time.sleep(1)
+
+machine.reset()
