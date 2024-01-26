@@ -3,9 +3,8 @@ import time
 
 led = machine.Pin(2, machine.Pin.OUT)
 
-for i in range(8):
+for i in range(4):
     led.on()
-    time.sleep(0.5)
+    time.sleep(1)
     led.off()
-    time.sleep(0.5)
-machine.reset()
+    time.sleep(1)
