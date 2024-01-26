@@ -2,7 +2,7 @@ from machine import Pin
 import time
 
 led = Pin(2, Pin.OUT)
-for i in range(16):
+for i in range(64):
     led.on()
     time.sleep(0.1)
     led.off()
