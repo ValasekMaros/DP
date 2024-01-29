@@ -26,7 +26,7 @@ sudo usermod -aG docker $USER
 sudo docker run hello-world
 ```
 5. Used Images
-- eclipse-mosquitto: docker pull eclipse-mosquitto
-- nodered/node-red:  docker pull nodered/node-red
-- influxdb:          docker pull influxdb
-- grafana/grafana:   docker pull grafana/grafana
+- eclipse-mosquitto: ```docker pull eclipse-mosquitto```
+- nodered/node-red:  ```docker pull nodered/node-red```
+- influxdb:          ```docker pull influxdb```
+- grafana/grafana:   ```docker pull grafana/grafana```
