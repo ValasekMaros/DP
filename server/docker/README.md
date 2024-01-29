@@ -30,3 +30,4 @@ sudo docker run hello-world
 - nodered/node-red:  ```docker pull nodered/node-red```
 - influxdb:          ```docker pull influxdb```
 - grafana/grafana:   ```docker pull grafana/grafana```
+(More about images in their folders)
