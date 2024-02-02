@@ -5,25 +5,25 @@ machine.freq(80000000)
 print(machine.freq())
 
 calc_interval = 1000
-debounce_time = 125
-rainTrigger = 0
-lastMicrosRG = 0
+wind_debounce_time = 125
+windTrigger = 0
+wind_lastMicros = 0
 
-def countingRain(pin):
+def countingWind(pin):
     print('Interupt...')
-    global lastMicrosRG
-    global debounce_time
-    global rainTrigger
-    if round(time.time_ns() / 1000) - lastMicrosRG >= debounce_time * 1000:
-        rainTrigger += 1
-        lastMicrosRG = round(time.time_ns() / 1000)
+    global wind_lastMicros
+    global wind_debounce_time
+    global windTrigger
+    if round(time.time_ns() / 1000) - wind_lastMicros >= wind_debounce_time * 1000:
+        windTrigger += 1
+        wind_lastMicros = round(time.time_ns() / 1000)
     
-pinRain = machine.Pin(15, machine.Pin.IN)
-pinRain.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingRain)
+pinWindSpeed = machine.Pin(15, machine.Pin.IN)
+pinWindSpeed.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingWind)
 
 nextcalc = round(time.time_ns() / 1000000) + calc_interval 
 while True:
     timer = round(time.time_ns() / 1000000)
     if timer >= nextcalc:
         nextcalc = timer + calc_interval
-        print('Total Tips:', rainTrigger)
+        print('Total Tips:', windTrigger)

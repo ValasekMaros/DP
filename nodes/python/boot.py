@@ -1,8 +1,14 @@
+import machine
 import network
 import auth
 from ota import OTAUpdater
+import time
+
+machine.freq(80000000)
 
 print('...boot...')
+zaciatok = time.time()
+
 sta_if = network.WLAN(network.STA_IF)
 
 sta_if.active(True)

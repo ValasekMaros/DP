@@ -2,19 +2,24 @@ import machine
 import time
 
 machine.freq(80000000)
+print(machine.freq())
 
 calc_interval = 1000
-debounce_time = 225
+rain_debounce_time = 150
 rainTrigger = 0
-lastMicrosRG = 0
+rain_lastMicros = 0
 
 def countingRain(pin):
     pinRain.irq(None)
+    print('Interupt...')
+    global rain_lastMicros
+    global rain_debounce_time
     global rainTrigger
-    rainTrigger += 1
-    time.sleep(0.15)
+    if round(time.time_ns() / 1000) - rain_lastMicros >= rain_debounce_time * 1000:
+        rainTrigger += 1
+        rain_lastMicros = round(time.time_ns() / 1000)
     pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
-
+    
 pinRain = machine.Pin(15, machine.Pin.IN)
 pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
 
@@ -24,3 +29,4 @@ while True:
     if timer >= nextcalc:
         nextcalc = timer + calc_interval
         print('Total Tips:', rainTrigger)
+
