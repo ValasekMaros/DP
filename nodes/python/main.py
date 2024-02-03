@@ -22,9 +22,9 @@ message = {
     "windDir_deg": 0
 }
 
-# Sleep time for sleep after error and sleep after successful message send
-errorTime = 60 * 1000
-sendTime = 300 * 1000
+# Sleep time(in seconds) for sleep after error and sleep after successful message send
+errorTime = 60
+sendTime = 300
 # MQTT ID for connect
 mqtt_client = ubinascii.hexlify(machine.unique_id())
 # MQTT topic for publishing
@@ -132,8 +132,11 @@ if sta_if.isconnected():
         mqtt.connect()
     except OSError as e:
         print('Cant connect to MQTT, error -' + e)
+        endTime = time.time()
+        cycleTime = endTime - zaciatok
+        print('Cycle time:', cycleTime)
         print('Error sleep')
-        machine.deepsleep(errorTime)
+        machine.deepsleep((errorTime - cycleTime) * 1000)
         machine.reset()
     else:
         try:
@@ -141,21 +144,29 @@ if sta_if.isconnected():
             mqtt.publish(topic_pub, json.dumps(message), False, 1)
         except OSError as e:
             print('Problem with Publish, error -' + e)
+            endTime = time.time()
+            cycleTime = endTime - zaciatok
+            print('Cycle time:', cycleTime)
             print('Error sleep')
-            machine.deepsleep(errorTime)
+            machine.deepsleep((errorTime - cycleTime) * 1000)
             machine.reset()
         else:
             print('Message send')
             mqtt.disconnect()
             sta_if.disconnect()
             sta_if.active(False)
-            print(time.time() - zaciatok)
+            endTime = time.time()
+            cycleTime = endTime - zaciatok
+            print('Cycle time:', cycleTime)
             print('Deep sleep after message')
-            machine.deepsleep(sendTime)
+            machine.deepsleep((sendTime - cycleTime ) * 1000)
             machine.reset()
 else:
     print('Cant connect to WiFi, error -', e)
+    endTime = time.time()
+    cycleTime = endTime - zaciatok
+    print('Cycle time:', cycleTime)
     print('Error sleep')
-    machine.deepsleep(errorTime)
+    machine.deepsleep((errorTime - cycleTime) * 1000)
     machine.reset()
 print('...main...')
