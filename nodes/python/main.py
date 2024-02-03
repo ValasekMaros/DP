@@ -6,9 +6,14 @@ import gc
 from umqttsimple import MQTTClient
 from bmp085 import BMP180
 import dht
+import json
 gc.collect()
 
 print('...main...')
+
+message = {
+    "espID": "00"
+}
 
 # Sleep time for sleep after error and sleep after successful message send
 errorTime = 15 * 1000
@@ -72,12 +77,16 @@ temp_bmp180 = bmp180.temperature
 press_bmp180 = bmp180.pressure
 altitude_bmp180 = bmp180.altitude
 print(temp_bmp180, press_bmp180, altitude_bmp180)
+message['bmp_temp'] = temp_bmp180
+message['bmp_press'] = press_bmp180
 
 dht22.measure()
 time.sleep(0.25)
 temp_dht22 = dht22.temperature()
 hum_dht22 = dht22.humidity()
 print(temp_dht22, hum_dht22)
+message['dht_temp'] = temp_dht22
+message['dht_hum'] = hum_dht22
 
 pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
 nextcalc = round(time.time_ns() / 1000000) + calc_interval
@@ -86,6 +95,7 @@ while True:
     timer = round(time.time_ns() / 1000000)
     if timer >= nextcalc:
         print('Total Tips(Rain Gauge):', rainTrigger)
+        message['rain_tips'] = rainTrigger
         break
 #print('End of rain sensor:', timer)
 pinRain.irq(None)
@@ -96,6 +106,7 @@ while True:
     timer = round(time.time_ns() / 1000000)
     if timer >= nextcalc:
         print('Total Tips(Wind Speed):', windTrigger)
+        message['windSpeed_tips'] = windTrigger
         break
 pinWindSpeed.irq(None)
 
@@ -106,8 +117,8 @@ pinWindDir_value /= 8
 for i in range(len(windDirDeg)):
     if pinWindDir_value >= windDirMin[i] and pinWindDir_value <= windDirMax[i]:
         print('Wind Direction:', windDirDeg[i])
+        message['windDir_deg'] = windDirDeg[i]
         break
-    
 if sta_if.isconnected():
     try:
         mqtt = MQTTClient(mqtt_client, auth.mqtt_host, auth.mqtt_port, auth.mqtt_user, auth.mqtt_pass)
@@ -119,7 +130,8 @@ if sta_if.isconnected():
         machine.reset()
     else:
         try:
-            mqtt.publish(topic_pub, "Hello World", False , 1)
+            print(message)
+            mqtt.publish(topic_pub, json.dumps(message), False, 1)
         except OSError as e:
             print('Problem with Publish, error -' + e)
             print('Error sleep')
