@@ -23,8 +23,8 @@ message = {
 }
 
 # Sleep time for sleep after error and sleep after successful message send
-errorTime = 15 * 1000
-sendTime = 1 * 60 * 1000
+errorTime = 60 * 1000
+sendTime = 300 * 1000
 # MQTT ID for connect
 mqtt_client = ubinascii.hexlify(machine.unique_id())
 # MQTT topic for publishing
