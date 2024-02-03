@@ -18,7 +18,7 @@ mqtt_client = ubinascii.hexlify(machine.unique_id())
 # MQTT topic for publishing
 topic_pub = 'Testing'
 
-calc_interval = 1000
+calc_interval = 5000
 rain_debounce_time = 150
 wind_debounce_time = 125
 rainTrigger = 0
@@ -35,7 +35,7 @@ I2C = machine.I2C(0, sda = machine.Pin(21), scl = machine.Pin(22), freq = 40000)
 pinDHT = machine.Pin(23)
 pinRain = machine.Pin(4, machine.Pin.IN)
 pinWindSpeed = machine.Pin(2, machine.Pin.IN)
-pinWindDir = machine.ADC(machine.Pin(15))
+pinWindDir = machine.ADC(machine.Pin(36))
 pinWindDir.atten(machine.ADC.ATTN_11DB)
 # --------------------------------------------------------------------------------------------
 # Functions
@@ -80,12 +80,14 @@ hum_dht22 = dht22.humidity()
 print(temp_dht22, hum_dht22)
 
 pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
-nextcalc = round(time.time_ns() / 1000000) + calc_interval 
+nextcalc = round(time.time_ns() / 1000000) + calc_interval
+#print('Start of rain sensor:', nextcalc)
 while True:
     timer = round(time.time_ns() / 1000000)
     if timer >= nextcalc:
         print('Total Tips(Rain Gauge):', rainTrigger)
-    break
+        break
+#print('End of rain sensor:', timer)
 pinRain.irq(None)
 
 pinWindSpeed.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingWind)
@@ -94,32 +96,34 @@ while True:
     timer = round(time.time_ns() / 1000000)
     if timer >= nextcalc:
         print('Total Tips(Wind Speed):', windTrigger)
-    break
+        break
 pinWindSpeed.irq(None)
 
-while True:
-    pinWindDir_value = 0
-    for i in range(8):
-        pinWindDir_value += pinWindDir.read()
-    pinWindDir_value /= 8
-    for i in range(len(windDirDeg)):
-        if pinWindDir_value >= windDirMin[i] and pinWindDir_value <= windDirMax[i]:
-            print('Wind Direction:', windDirDeg[i])
-    time.sleep(0.5)
-    break
-
-mqtt = MQTTClient(mqtt_client, auth.mqtt_host, auth.mqtt_port, auth.mqtt_user, auth.mqtt_pass)
+pinWindDir_value = 0
+for i in range(8):
+    pinWindDir_value += pinWindDir.read()
+pinWindDir_value /= 8
+for i in range(len(windDirDeg)):
+    if pinWindDir_value >= windDirMin[i] and pinWindDir_value <= windDirMax[i]:
+        print('Wind Direction:', windDirDeg[i])
+        break
+    
 if sta_if.isconnected():
     try:
+        mqtt = MQTTClient(mqtt_client, auth.mqtt_host, auth.mqtt_port, auth.mqtt_user, auth.mqtt_pass)
         mqtt.connect()
     except OSError as e:
-        print('Cant connect to MQTT - ' + e)
+        print('Cant connect to MQTT, error -' + e)
+        print('Error sleep')
+        machine.deepsleep(errorTime)
         machine.reset()
     else:
         try:
             mqtt.publish(topic_pub, "Hello World", False , 1)
         except OSError as e:
-            print('Problem with Publish - ' + e)
+            print('Problem with Publish, error -' + e)
+            print('Error sleep')
+            machine.deepsleep(errorTime)
             machine.reset()
         else:
             print('Message send')
@@ -127,10 +131,12 @@ if sta_if.isconnected():
             sta_if.disconnect()
             sta_if.active(False)
             print(time.time() - zaciatok)
+            print('Deep sleep after message')
             machine.deepsleep(sendTime)
             machine.reset()
 else:
-    print('Cant connect to WiFi')
+    print('Cant connect to WiFi, error -', e)
+    print('Error sleep')
+    machine.deepsleep(errorTime)
     machine.reset()
 print('...main...')
-
