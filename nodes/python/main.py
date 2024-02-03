@@ -12,7 +12,14 @@ gc.collect()
 print('...main...')
 
 message = {
-    "espID": "00"
+    "espID": "00",
+    "bmp_temp": 0,
+    "bmp_press": 0,
+    "dht_temp": 0,
+    "dht_hum": 0,
+    "rain_tips": 0,
+    "windSpeed_tips": 0,
+    "windDir_deg": 0
 }
 
 # Sleep time for sleep after error and sleep after successful message send
