@@ -169,7 +169,7 @@ if sta_if.isconnected():
             machine.deepsleep((errorTime - cycleTime) * 1000)
             machine.reset()
         else:
-             print('Message send')
+            print('Message send')
             mqtt.disconnect()
             sta_if.disconnect()
             sta_if.active(False)
