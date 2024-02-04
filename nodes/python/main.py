@@ -49,6 +49,12 @@ pinRain = machine.Pin(4, machine.Pin.IN)
 pinWindSpeed = machine.Pin(2, machine.Pin.IN)
 pinWindDir = machine.ADC(machine.Pin(36))
 pinWindDir.atten(machine.ADC.ATTN_11DB)
+
+pinBMP_power = machine.Pin(3, machine.Pin.OUT)
+pinDHT_power = machine.Pin(1, machine.Pin.OUT)
+pinRain_power = machine.Pin(18, machine.Pin.OUT)
+pinWindSpeed_power = machine.Pin(5, machine.Pin.OUT)
+pinWindDir_power = machine.Pin(17, machine.Pin.OUT)
 # --------------------------------------------------------------------------------------------
 # Functions
 def countingRain(pin):
@@ -70,7 +76,11 @@ def countingWind(pin):
     if round(time.time_ns() / 1000) - wind_lastMicros >= wind_debounce_time * 1000:
         windTrigger += 1
         wind_lastMicros = round(time.time_ns() / 1000)
-
+# --------------------------------------------------------------------------------------------
+# Powering BMP and DHT
+pinBMP_power.on()
+pinDHT_power.on()
+machine.lightsleep(5 * 1000)
 # --------------------------------------------------------------------------------------------
 # Need to add try: for exception
 bmp180 = BMP180(I2C)
@@ -79,7 +89,6 @@ bmp180.sealevel = 1013
 dht22 = dht.DHT22(pinDHT)
 # --------------------------------------------------------------------------------------------
 bmp180.makegauge()
-time.sleep(0.25)
 temp_bmp180 = bmp180.temperature
 press_bmp180 = bmp180.pressure
 altitude_bmp180 = bmp180.altitude
@@ -88,13 +97,16 @@ message['bmp_temp'] = temp_bmp180
 message['bmp_press'] = press_bmp180
 
 dht22.measure()
-time.sleep(0.25)
 temp_dht22 = dht22.temperature()
 hum_dht22 = dht22.humidity()
 print(temp_dht22, hum_dht22)
 message['dht_temp'] = temp_dht22
 message['dht_hum'] = hum_dht22
 
+pinBMP_power.off()
+pinDHT_power.off()
+
+pinRain_power.on()
 pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
 nextcalc = round(time.time_ns() / 1000000) + calc_interval
 #print('Start of rain sensor:', nextcalc)
@@ -106,7 +118,9 @@ while True:
         break
 #print('End of rain sensor:', timer)
 pinRain.irq(None)
+pinRain_power.off()
 
+pinWindSpeed_power.on()
 pinWindSpeed.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingWind)
 nextcalc = round(time.time_ns() / 1000000) + calc_interval 
 while True:
@@ -116,7 +130,9 @@ while True:
         message['windSpeed_tips'] = windTrigger
         break
 pinWindSpeed.irq(None)
+pinWindSpeed_power.off()
 
+pinWindDir_power.on()
 pinWindDir_value = 0
 for i in range(8):
     pinWindDir_value += pinWindDir.read()
@@ -126,6 +142,8 @@ for i in range(len(windDirDeg)):
         print('Wind Direction:', windDirDeg[i])
         message['windDir_deg'] = windDirDeg[i]
         break
+pinWindDir_power.off()
+    
 if sta_if.isconnected():
     try:
         mqtt = MQTTClient(mqtt_client, auth.mqtt_host, auth.mqtt_port, auth.mqtt_user, auth.mqtt_pass)
@@ -151,7 +169,7 @@ if sta_if.isconnected():
             machine.deepsleep((errorTime - cycleTime) * 1000)
             machine.reset()
         else:
-            print('Message send')
+             print('Message send')
             mqtt.disconnect()
             sta_if.disconnect()
             sta_if.active(False)
