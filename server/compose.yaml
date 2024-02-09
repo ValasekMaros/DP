@@ -66,6 +66,7 @@ services:
     volumes:
       - /var/log:/var/log
       - /home/dp/project/mosquitto/log/:/var/log/mosquitto/
+      - /var/lib/docker/containers:/var/lib/docker/containers
       - /home/dp/project/promtail/promtail-config.yaml:/etc/promtail/promtail-config.yaml
     restart: unless-stopped
     command: -config.file=/etc/promtail/promtail-config.yaml
