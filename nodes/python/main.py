@@ -20,7 +20,10 @@ message = {
     "rain_tips": None,
     "rain_mm": None,
     "windSpeed_tips": None,
-    "windDir_deg": None
+    "windSpeed_1Hz": None,
+    "windSpeed_kmh": None,
+    "windSpeed_ms": None,
+    "windDir_deg": None,
 }
 
 # Sleep time(in seconds) for sleep after error and sleep after successful message send, and for warming sensors
@@ -37,7 +40,8 @@ rain_debounce_time = 150
 wind_debounce_time = 125
 rainTrigger = None
 windSpeedTrigger = None
-windDir = None
+windDir_deg = None
+windDir_name = None
 
 lastMicrosRG = 0
 wind_lastMicros = 0
@@ -45,6 +49,7 @@ wind_lastMicros = 0
 windDirMin = [2923, 1367, 1586, 106, 159, 30, 493, 263, 896, 726, 2246, 2126, 4054, 3179, 3644, 2536]
 windDirMax = [3005, 1449, 1668, 158, 217, 105, 575, 345, 978, 808, 2328, 2208, 4136, 3261, 3726, 2618]
 windDirDeg = [0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, 202.5, 225, 247.5, 270, 292.5, 315, 337.5]
+windDirName = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']
 # --------------------------------------------------------------------------------------------
 # Pins
 I2C = machine.I2C(0, sda = machine.Pin(21), scl = machine.Pin(22), freq = 40000)
@@ -166,10 +171,13 @@ for i in range(8):
 pinWindDir_value /= 8
 for i in range(len(windDirDeg)):
     if pinWindDir_value >= windDirMin[i] and pinWindDir_value <= windDirMax[i]:
-        windDir = windDirDeg[i]
-        message['windDir_deg'] = windDir
+        windDir_deg = windDirDeg[i]
+        windDir_name = windDirName[i]
+        message['windDir_deg'] = windDir_deg
+        message['windDir_name'] = windDir_name
         break
-print('Wind Direction:', windDir)
+print('Wind Direction Deg:', windDir_deg)
+print('Wind Direction Name:', windDir_name)
 pinWindDir_power.off()
     
 if sta_if.isconnected():
