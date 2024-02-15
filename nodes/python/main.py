@@ -4,7 +4,8 @@ import os
 import ubinascii
 import gc
 from umqttsimple import MQTTClient
-from bmp085 import BMP180
+#from bmp085 import BMP180
+import BME280
 import dht
 import json
 gc.collect()
@@ -13,8 +14,11 @@ print('...main...')
 
 message = {
     "espID": "00",
-    "bmp_temp": None,
-    "bmp_press": None,
+    #"bmp_temp": None,
+    #"bmp_press": None,
+    "bme_temp": None,
+    "bme_hum": None,
+    "bme_press": None,
     "dht_temp": None,
     "dht_hum": None,
     "rain_tips": None,
@@ -52,14 +56,15 @@ windDirDeg = [0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, 202.5, 225, 247.5, 
 windDirName = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']
 # --------------------------------------------------------------------------------------------
 # Pins
-I2C = machine.I2C(0, sda = machine.Pin(21), scl = machine.Pin(22), freq = 40000)
+i2c = machine.I2C(0, scl=machine.Pin(22), sda=machine.Pin(21), freq=10000)
 pinDHT = machine.Pin(23)
 pinRain = machine.Pin(4, machine.Pin.IN)
 pinWindSpeed = machine.Pin(2, machine.Pin.IN)
 pinWindDir = machine.ADC(machine.Pin(36))
 pinWindDir.atten(machine.ADC.ATTN_11DB)
 
-pinBMP_power = machine.Pin(19, machine.Pin.OUT)
+#pinBMP_power = machine.Pin(19, machine.Pin.OUT)
+pinBME_power = machine.Pin(19, machine.Pin.OUT)
 pinDHT_power = machine.Pin(18, machine.Pin.OUT)
 
 pinRain_power = machine.Pin(5, machine.Pin.OUT)
@@ -89,20 +94,22 @@ def countingWind(pin):
         wind_lastMicros = round(time.time_ns() / 1000)
 # --------------------------------------------------------------------------------------------
 # Powering BMP and DHT
-pinBMP_power.on()
+#pinBMP_power.on()
+pinBME_power.on()
 pinDHT_power.on()
 machine.lightsleep(warmSensor * 1000)
 # --------------------------------------------------------------------------------------------
 # Need to add try: for exception
 try:
-    bmp180 = BMP180(I2C)
-    bmp180.oversample = 3
-    bmp180.sealevel = 1013
+    #bmp180 = BMP180(I2C)
+    #bmp180.oversample = 3
+    #bmp180.sealevel = 1013
+    bme280 = BME280.BME280(mode=3, address=0x77, i2c=i2c)
     dht22 = dht.DHT22(pinDHT)
-    bmp180.makegauge()
+    #bmp180.makegauge()
     dht22.measure()
 except OSError as e:
-    print('Cand connect to BMP or DHT, error -', e)
+    print('Cand connect to BME or DHT, error -', e)
     endTime = time.time()
     cycleTime = endTime - zaciatok
     print('Cycle time:', cycleTime)
@@ -110,16 +117,24 @@ except OSError as e:
     machine.deepsleep((errorTime - cycleTime) * 1000)
     machine.reset()
 else:
-    print('Connected to BMP and DHT')
+    print('Connected to BME and DHT')
     
 # --------------------------------------------------------------------------------------------
-bmp180.makegauge()
-temp_bmp180 = bmp180.temperature
-press_bmp180 = bmp180.pressure
-altitude_bmp180 = bmp180.altitude
-print('BMP:', temp_bmp180, press_bmp180, altitude_bmp180)
-message['bmp_temp'] = temp_bmp180
-message['bmp_press'] = press_bmp180
+#bmp180.makegauge()
+#temp_bmp180 = bmp180.temperature
+#press_bmp180 = bmp180.pressure
+#altitude_bmp180 = bmp180.altitude
+#print('BMP:', temp_bmp180, press_bmp180, altitude_bmp180)
+#message['bmp_temp'] = temp_bmp180
+#message['bmp_press'] = press_bmp180
+
+temp_bme280 = bme280.temperature
+hum_bme280 = bme280.humidity
+press_bme280 = bme280.pressure
+print('BME:', temp_bme280, hum_bme280, press_bme280)
+message['bme_temp'] = temp_bme280
+message['bme_hum'] = hum_bme280
+message['bme_press'] = press_bme280
 
 dht22.measure()
 temp_dht22 = dht22.temperature()
@@ -128,7 +143,8 @@ print('DHT', temp_dht22, hum_dht22)
 message['dht_temp'] = temp_dht22
 message['dht_hum'] = hum_dht22
 
-pinBMP_power.off()
+#pinBMP_power.off()
+pinBME_power.off()
 pinDHT_power.off()
 
 pinRain_power.on()
