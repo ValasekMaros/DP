@@ -156,8 +156,11 @@ while True:
     time.sleep(0.1)
     if timer >= nextcalc:
         print('Total Tips(Rain Gauge):', rainTrigger)
-        message['rain_tips'] = rainTrigger
-        message['rain_mm'] = rainTrigger * 0.2794 / calc_interval * 3600000
+        try:
+            message['rain_tips'] = rainTrigger
+            message['rain_mm'] = rainTrigger * 0.2794 / calc_interval * 3600000
+        except:
+            pass
         break
 #print('End of rain sensor:', timer)
 pinRain.irq(None)
@@ -171,11 +174,14 @@ while True:
     time.sleep(0.1)
     if timer >= nextcalc:
         print('Total Tips(Wind Speed):', windSpeedTrigger)
-        windSpeed_1Hz = windSpeedTrigger / timer
-        message['windSpeed_tips'] = windSpeedTrigger / timer
-        message['windSpeed_1Hz'] = windSpeed_1Hz
-        message['windSpeed_kmh'] = windSpeed_1Hz * 2.4
-        message['windSpeed_ms'] = (windSpeed_1Hz * 2.4) / 3.6
+        try:
+            windSpeed_1Hz = windSpeedTrigger / timer
+            message['windSpeed_tips'] = windSpeedTrigger / timer
+            message['windSpeed_1Hz'] = windSpeed_1Hz
+            message['windSpeed_kmh'] = windSpeed_1Hz * 2.4
+            message['windSpeed_ms'] = (windSpeed_1Hz * 2.4) / 3.6
+        except:
+            pass
         break
 pinWindSpeed.irq(None)
 pinWindSpeed_power.off()
