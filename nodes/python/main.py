@@ -28,6 +28,8 @@ message = {
     "windSpeed_kmh": None,
     "windSpeed_ms": None,
     "windDir_deg": None,
+    "windDir_name": None,
+    "windDir_ADC": None	
 }
 
 # Sleep time(in seconds) for sleep after error and sleep after successful message send, and for warming sensors
@@ -42,24 +44,24 @@ topic_pub = 'Testing'
 calc_interval = 5000
 rain_debounce_time = 150
 wind_debounce_time = 125
-rainTrigger = None
-windSpeedTrigger = None
-windDir_deg = None
+rainTrigger = 0
+windSpeedTrigger = 0
+windDir_deg = 0
 windDir_name = None
 
 lastMicrosRG = 0
 wind_lastMicros = 0
 
-windDirMin = [2923, 1367, 1586, 106, 159, 30, 493, 263, 896, 726, 2246, 2126, 4054, 3179, 3644, 2536]
-windDirMax = [3005, 1449, 1668, 158, 217, 105, 575, 345, 978, 808, 2328, 2208, 4136, 3261, 3726, 2618]
+windDirMin = [2783, 1336, 1566, 167, 200, 104, 532, 320, 903, 746, 2371, 2045, 3723, 3224, 3278, 2579]
+windDirMax = [3223, 1565, 1885, 205, 245, 128, 650, 392, 1103, 901, 2578, 2370, 4334, 3277, 3722, 2782]
 windDirDeg = [0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, 202.5, 225, 247.5, 270, 292.5, 315, 337.5]
 windDirName = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']
 # --------------------------------------------------------------------------------------------
 # Pins
 i2c = machine.I2C(0, scl=machine.Pin(22), sda=machine.Pin(21), freq=10000)
 pinDHT = machine.Pin(23)
-pinRain = machine.Pin(4, machine.Pin.IN)
-pinWindSpeed = machine.Pin(2, machine.Pin.IN)
+pinRain = machine.Pin(34, machine.Pin.IN)
+pinWindSpeed = machine.Pin(15, machine.Pin.IN)
 pinWindDir = machine.ADC(machine.Pin(36))
 pinWindDir.atten(machine.ADC.ATTN_11DB)
 
@@ -97,6 +99,9 @@ def countingWind(pin):
 #pinBMP_power.on()
 pinBME_power.on()
 pinDHT_power.on()
+pinWindDir_power.on()
+pinRain_power.on()
+pinWindSpeed_power.on()
 machine.lightsleep(warmSensor * 1000)
 # --------------------------------------------------------------------------------------------
 # Need to add try: for exception
@@ -147,7 +152,6 @@ message['dht_hum'] = hum_dht22
 pinBME_power.off()
 pinDHT_power.off()
 
-pinRain_power.on()
 pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
 nextcalc = round(time.time_ns() / 1000000) + calc_interval
 #print('Start of rain sensor:', nextcalc)
@@ -166,7 +170,6 @@ while True:
 pinRain.irq(None)
 pinRain_power.off()
 
-pinWindSpeed_power.on()
 pinWindSpeed.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingWind)
 nextcalc = round(time.time_ns() / 1000000) + calc_interval 
 while True:
@@ -175,8 +178,8 @@ while True:
     if timer >= nextcalc:
         print('Total Tips(Wind Speed):', windSpeedTrigger)
         try:
-            windSpeed_1Hz = windSpeedTrigger / timer
-            message['windSpeed_tips'] = windSpeedTrigger / timer
+            windSpeed_1Hz = windSpeedTrigger / calc_interval * 1000
+            message['windSpeed_tips'] = windSpeedTrigger
             message['windSpeed_1Hz'] = windSpeed_1Hz
             message['windSpeed_kmh'] = windSpeed_1Hz * 2.4
             message['windSpeed_ms'] = (windSpeed_1Hz * 2.4) / 3.6
@@ -186,11 +189,11 @@ while True:
 pinWindSpeed.irq(None)
 pinWindSpeed_power.off()
 
-pinWindDir_power.on()
 pinWindDir_value = 0
 for i in range(8):
     pinWindDir_value += pinWindDir.read()
 pinWindDir_value /= 8
+message['windDir_ADC'] = pinWindDir_value
 for i in range(len(windDirDeg)):
     if pinWindDir_value >= windDirMin[i] and pinWindDir_value <= windDirMax[i]:
         windDir_deg = windDirDeg[i]
