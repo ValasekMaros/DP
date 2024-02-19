@@ -20,7 +20,7 @@ def countingRain(pin):
         rain_lastMicros = round(time.time_ns() / 1000)
     pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
     
-pinRain = machine.Pin(15, machine.Pin.IN)
+pinRain = machine.Pin(4, machine.Pin.IN)
 pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
 
 nextcalc = round(time.time_ns() / 1000000) + calc_interval 
