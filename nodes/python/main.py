@@ -40,6 +40,7 @@ sendTime = 900
 mqtt_client = ubinascii.hexlify(machine.unique_id())
 # MQTT topic for publishing
 topic_pub = 'Testing'
+topic_pubError = 'Error'
 
 calc_interval = 5000
 rain_debounce_time = 150
@@ -115,12 +116,40 @@ try:
     dht22.measure()
 except OSError as e:
     print('Cand connect to BME or DHT, error -', e)
-    endTime = time.time()
-    cycleTime = endTime - zaciatok
-    print('Cycle time:', cycleTime)
-    print('Error sleep')
-    machine.deepsleep((errorTime - cycleTime) * 1000)
-    machine.reset()
+    try:
+        mqtt = MQTTClient(mqtt_client, auth.mqtt_host, auth.mqtt_port, auth.mqtt_user, auth.mqtt_pass)
+        mqtt.connect()
+    except OSError as e:
+        print('Cant connect to MQTT, error -' + e)
+        endTime = time.time()
+        cycleTime = endTime - zaciatok
+        print('Cycle time:', cycleTime)
+        print('Error sleep')
+        machine.deepsleep((errorTime - cycleTime) * 1000)
+        machine.reset()
+    else:
+        try:
+            print(message)
+            mqtt.publish(topic_pub, "Error", False, 1)
+        except OSError as e:
+            print('Problem with Error Publish, error -' + e)
+            endTime = time.time()
+            cycleTime = endTime - zaciatok
+            print('Cycle time:', cycleTime)
+            print('Error sleep')
+            machine.deepsleep((errorTime - cycleTime) * 1000)
+            machine.reset()
+        else:
+            print('Error Message send')
+            mqtt.disconnect()
+            sta_if.disconnect()
+            sta_if.active(False)
+            endTime = time.time()
+            cycleTime = endTime - zaciatok
+            print('Cycle time:', cycleTime)
+            print('Deep sleep after error message')
+            machine.deepsleep((errorTime - cycleTime) * 1000)
+            machine.reset()
 else:
     print('Connected to BME and DHT')
     
