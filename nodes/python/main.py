@@ -35,7 +35,7 @@ message = {
 # Sleep time(in seconds) for sleep after error and sleep after successful message send, and for warming sensors
 warmSensor = 5
 errorTime = 300
-sendTime = 900
+sendTime = 1800
 # MQTT ID for connect
 mqtt_client = ubinascii.hexlify(machine.unique_id())
 # MQTT topic for publishing
