@@ -8,7 +8,6 @@ from umqttsimple import MQTTClient
 import BME280
 import dht
 import json
-import ina219
 gc.collect()
 
 print('...main...')
@@ -30,8 +29,7 @@ message = {
     "windSpeed_ms": None,
     "windDir_deg": None,
     "windDir_name": None,
-    "windDir_ADC": None,
-    "battery_voltage": None
+    "windDir_ADC": None	
 }
 
 # Sleep time(in seconds) for sleep after error and sleep after successful message send, and for warming sensors
@@ -105,10 +103,6 @@ pinWindDir_power.on()
 pinRain_power.on()
 pinWindSpeed_power.on()
 machine.lightsleep(warmSensor * 1000)
-
-sensor = ina219.INA219(i)
-sensor.set_calibration_16V_400mA()
-
 # --------------------------------------------------------------------------------------------
 # Need to add try: for exception
 try:
@@ -210,11 +204,7 @@ for i in range(len(windDirDeg)):
 print('Wind Direction Deg:', windDir_deg)
 print('Wind Direction Name:', windDir_name)
 pinWindDir_power.off()
-
-batteryVoltage = sensor.bus_voltage
-print("Bus voltage   / V: %8.3f" % (batteryVoltage))
-message['battery_voltage'] = batteryVoltage
-
+    
 if sta_if.isconnected():
     try:
         mqtt = MQTTClient(mqtt_client, auth.mqtt_host, auth.mqtt_port, auth.mqtt_user, auth.mqtt_pass)
