@@ -78,7 +78,9 @@
                 "7854719d33019e25",
                 "0aa8f1c1084b6282",
                 "f92c99b12b662c95",
-                "d777f82ef5d96b86"
+                "d777f82ef5d96b86",
+                "13180289d11a95a8",
+                "d2306a3dca7b1320"
             ]
         ]
     },
@@ -184,7 +186,7 @@
         "type": "influxdb out",
         "z": "96cdfc911e5f30a8",
         "influxdb": "fc9141baac035642",
-        "name": "InfluxDB/temperature",
+        "name": "InfluxDB/airTemperature",
         "measurement": "airTemperature",
         "precision": "s",
         "retentionPolicy": "",
@@ -193,7 +195,7 @@
         "retentionPolicyV18Flux": "",
         "org": "project",
         "bucket": "sensors",
-        "x": 1020,
+        "x": 1030,
         "y": 60,
         "wires": []
     },
@@ -202,7 +204,7 @@
         "type": "influxdb out",
         "z": "96cdfc911e5f30a8",
         "influxdb": "fc9141baac035642",
-        "name": "InfluxDB/humidity",
+        "name": "InfluxDB/airHumidity",
         "measurement": "airHumidity",
         "precision": "",
         "retentionPolicy": "",
@@ -211,7 +213,7 @@
         "retentionPolicyV18Flux": "",
         "org": "project",
         "bucket": "sensors",
-        "x": 1010,
+        "x": 1020,
         "y": 160,
         "wires": []
     },
@@ -220,7 +222,7 @@
         "type": "influxdb out",
         "z": "96cdfc911e5f30a8",
         "influxdb": "fc9141baac035642",
-        "name": "InfluxDB/pressure",
+        "name": "InfluxDB/airPressure",
         "measurement": "airPressure",
         "precision": "",
         "retentionPolicy": "",
@@ -229,7 +231,7 @@
         "retentionPolicyV18Flux": "",
         "org": "project",
         "bucket": "sensors",
-        "x": 1010,
+        "x": 1020,
         "y": 260,
         "wires": []
     },
@@ -248,7 +250,7 @@
         "org": "project",
         "bucket": "sensors",
         "x": 1030,
-        "y": 500,
+        "y": 580,
         "wires": []
     },
     {
@@ -288,7 +290,7 @@
                 "t": "set",
                 "p": "payload",
                 "pt": "msg",
-                "to": "[\t   {\t       \"percent\":msg.payload.bme_press\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation',\t        \"sensor\":'BME280'\t    }\t]",
+                "to": "[\t   {\t       \"hPa\":msg.payload.bme_press\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation',\t        \"sensor\":'BME280'\t    }\t]",
                 "tot": "jsonata"
             }
         ],
@@ -391,7 +393,7 @@
         "type": "influxdb out",
         "z": "96cdfc911e5f30a8",
         "influxdb": "fc9141baac035642",
-        "name": "InfluxDB/pressure",
+        "name": "InfluxDB/windSpeed",
         "measurement": "windSpeed",
         "precision": "",
         "retentionPolicy": "",
@@ -400,7 +402,7 @@
         "retentionPolicyV18Flux": "",
         "org": "project",
         "bucket": "sensors",
-        "x": 1010,
+        "x": 1020,
         "y": 320,
         "wires": []
     },
@@ -409,7 +411,7 @@
         "type": "influxdb out",
         "z": "96cdfc911e5f30a8",
         "influxdb": "fc9141baac035642",
-        "name": "InfluxDB/pressure",
+        "name": "InfluxDB/windDirection",
         "measurement": "windDirection",
         "precision": "",
         "retentionPolicy": "",
@@ -418,7 +420,7 @@
         "retentionPolicyV18Flux": "",
         "org": "project",
         "bucket": "sensors",
-        "x": 1010,
+        "x": 1020,
         "y": 380,
         "wires": []
     },
@@ -427,7 +429,7 @@
         "type": "influxdb out",
         "z": "96cdfc911e5f30a8",
         "influxdb": "fc9141baac035642",
-        "name": "InfluxDB/pressure",
+        "name": "InfluxDB/rainGauge",
         "measurement": "rainGauge",
         "precision": "",
         "retentionPolicy": "",
@@ -439,5 +441,79 @@
         "x": 1010,
         "y": 440,
         "wires": []
+    },
+    {
+        "id": "13180289d11a95a8",
+        "type": "change",
+        "z": "96cdfc911e5f30a8",
+        "name": "airDewPoint - BME280",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"celsius\":msg.payload.bme_temp - ((100 - msg.payload.bme_hum) / 5)\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation',\t        \"sensor\":'BME280'\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 480,
+        "y": 500,
+        "wires": [
+            [
+                "fca26e21852167cb",
+                "5df8ca37cd22d5d0"
+            ]
+        ]
+    },
+    {
+        "id": "5df8ca37cd22d5d0",
+        "type": "influxdb out",
+        "z": "96cdfc911e5f30a8",
+        "influxdb": "fc9141baac035642",
+        "name": "InfluxDB/airDewPoint",
+        "measurement": "airDewPoint",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "sensors",
+        "x": 1020,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "d2306a3dca7b1320",
+        "type": "change",
+        "z": "96cdfc911e5f30a8",
+        "name": "airDewPoint - DHT22",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"celsius\":msg.payload.dht_temp - ((100 - msg.payload.dht_hum) / 5)\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation',\t        \"sensor\":'DHT22'\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 480,
+        "y": 560,
+        "wires": [
+            [
+                "5df8ca37cd22d5d0",
+                "fca26e21852167cb"
+            ]
+        ]
     }
 ]
