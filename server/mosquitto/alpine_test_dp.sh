@@ -25,6 +25,7 @@ DIFFWS=$(($WindSpeedH-$WindSpeedL+1))
 DIFFWD=$(($WindDirH-$WindDirL+1))
 DIFFBV=$(($BattVolH-$BattVolL+1))
 RANDOM=$$
+RANDOMSIX=$((RANDOM % 7 + 0))
 echo ""
 echo "Start Testing..."
 echo ""
@@ -42,8 +43,32 @@ do
         WSKM=$((WS*3))
         WD=$(($(($RANDOM%$DIFFWD))+$WindDirL))
         BV=$(($(($RANDOM%$DIFFBV))+$BattVolL))
-        mosquitto_pub -u dp -P Valasek_Maros -t "$Topic" -m {'"espID"':'"'$id'"'", "'"bme_temp"':$TBME", "'"bme_hum"':$HBME", "'"bme_press"':$P", "'"dht_temp"':$TDHT", "'"dht_hum"':$HDHT", "'"rain_tips"':$RANDOM", "'"rain_mm"':$R", "'"windSpeed_tips"':$RANDOM", "'"windSpeed_1Hz"':$RANDOM", "'"windSpeed_kmh"':$WSKM", "'"windSpeed_ms"':$WS", "'"windDir_deg"':$WD", "'"windDir_Name"':'"'N'"'", "'"windDir_ADC"':$WD", "'"battery_voltage"':$BV}
 
+        case $RANDOMSIX in
+                "0")
+                        STATUS="OK"
+                        ;;
+                "1")
+                        STATUS="Error:WiFi"
+                        ;;
+                "2")
+                        STATUS="Error:BME/DHT"
+                        ;;
+                "3")
+                        STATUS="Error:MS-WH-SP-RG"
+                        ;;
+                "4")
+                        STATUS="Error:WH-SP-WS01"
+                        ;;
+                "5")
+                        STATUS="Error:WH-SP-WD"
+                        ;;
+                "6")
+                        STATUS="Error:MQTT"
+                        ;;
+        esac
+
+        mosquitto_pub -u dp -P Valasek_Maros -t "$Topic" -m {'"espID"':'"'$id'"'", "'"bme_temp"':$TBME", "'"bme_hum"':$HBME", "'"bme_press"':$P", "'"dht_temp"':$TDHT", "'"dht_hum"':$HDHT", "'"rain_tips"':$RANDOM", "'"rain_mm"':$R", "'"windSpeed_tips"':$RANDOM", "'"windSpeed_1Hz"':$RANDOM", "'"windSpeed_kmh"':$WSKM", "'"windSpeed_ms"':$WS", "'"windDir_deg"':$WD", "'"windDir_Name"':'"'N'"'", "'"windDir_ADC"':$WD", "'"battery_voltage"':$BV", "'"status"':'"'$STATUS'"'}
         sleep $SLEEP
 done
 
