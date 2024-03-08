@@ -20,7 +20,7 @@ while not sta_if.isconnected():
 print('Connection successful')
 print(sta_if.ifconfig())
         
-firmware_url = "https://raw.githubusercontent.com/ValasekMaros/DP/main/nodes/python/"
+firmware_url = "https://raw.githubusercontent.com/ValasekMaros/DP/main/nodes/python/stable/"
 
 ota_updater = OTAUpdater(firmware_url, "main.py")
 
