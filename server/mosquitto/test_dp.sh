@@ -1,7 +1,7 @@
 #! usr/bin/bash
 read -p "Number of records: " N
 read -p "Sleep time in seconds: " SLEEP
-read -p "MQTT Topic" topic
+read -p "MQTT Topic: " Topic
 read -p "ID number (00): " id
 read -p "Temperature(HIGH): " TempH
 read -p "Temperature(LOW): " TempL
@@ -30,20 +30,20 @@ echo ""
 echo "Start Testing..."
 echo ""
 
-for((i=1;i<=$N;i++))
+for i in $(seq $N)
 do
-	echo "Record Number: $i"
-	TBME=$(($(($RANDOM1%$DIFFT))+$TempL))
-  TDHT=$(($(($RANDOM2%$DIFFT))+$TempL))
-	HBME=$(($(($RANDOM1%$DIFFH))+$HumL))
-	HDHT=$(($(($RANDOM2%$DIFFH))+$HumL))
-  P=$(($(($RANDOM1%$DIFFB))+$PressL))
-  R=$(($(($RANDOM1%$DIFFR))+$RainL))
-  WS=$(($(($RANDOM1%$DIFFWS))+$WindSpeedL))
-  WD=$(($(($RANDOM1%$DIFFWD))+$WindDirL))
-  BV=$(($(($RANDOM1%$DIFFBV))+$BattVolL))
-	mosquitto_pub -h 192.168.1.250 -u dp -P Valasek_Maros -t '"'$topic'"' -m {'"espID"':'"'$id'"'", "'"bme_temp"':$T", "'"bme_hum"':$H", "'"bme_press"':$P", "'"dht_temp"':$T", "'"dht_hum"':$H", "'"rain_tips"':$Random1", "'"rain_mm"':$R", "'"windSpeed_tips"':$Random1", "'"windSpeed_1Hz"':$Random2", "'"windSpeed_kmh"':($Random1+$Random2)/2", "'"windSpeed_ms"':$WS", "'"windDir_deg"':$WD", "'"windDir_Name"':"N"", "'"windDir_ADC"':$WD*100", "'"battery_voltage"':$BV}
-	sleep $SLEEP
+        echo "Record Number: $i"
+        TBME=$(($(($RANDOM1%$DIFFT))+$TempL))
+  	TDHT=$(($(($RANDOM2%$DIFFT))+$TempL))
+        HBME=$(($(($RANDOM1%$DIFFH))+$HumL))
+        HDHT=$(($(($RANDOM2%$DIFFH))+$HumL))
+	P=$(($(($RANDOM1%$DIFFP))+$PressL))
+  	R=$(($(($RANDOM1%$DIFFR))+$RainL))
+  	WS=$(($(($RANDOM1%$DIFFWS))+$WindSpeedL))
+  	WD=$(($(($RANDOM1%$DIFFWD))+$WindDirL))
+  	BV=$(($(($RANDOM1%$DIFFBV))+$BattVolL))
+        mosquitto_pub -u dp -P Valasek_Maros -t "$Topic" -m {'"espID"':'"'$id'"'", "'"bme_temp"':$T", "'"bme_hum"':$H", "'"bme_press"':$P", "'"dht_temp"':$T", "'"dht_hum"':$H", "'"rain_tips"':$Random1", "'"rain_mm"':$R", "'"windSpeed_tips"':$Random1", "'"windSpeed_1Hz"':$Random2", "'"windSpeed_kmh"':$Random1+$Random2/2", "'"windSpeed_ms"':$WS", "'"windDir_deg"':$WD", "'"windDir_Name"':"N"", "'"windDir_ADC"':$WD*100", "'"battery_voltage"':$BV}
+        sleep $SLEEP
 done
 
 echo ""
