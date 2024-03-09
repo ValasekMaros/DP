@@ -8,10 +8,18 @@
         "env": []
     },
     {
+        "id": "99587b48e67a75ad",
+        "type": "tab",
+        "label": "DP-Test",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "de24aff89ea8a24b",
         "type": "mqtt-broker",
         "name": "MQTT Broker",
-        "broker": "192.168.1.250",
+        "broker": "mosquitto",
         "port": "1883",
         "clientid": "",
         "autoConnect": true,
@@ -54,12 +62,27 @@
         "rejectUnauthorized": true
     },
     {
+        "id": "6939a609d9250890",
+        "type": "influxdb",
+        "hostname": "127.0.0.1",
+        "port": "8086",
+        "protocol": "http",
+        "database": "database",
+        "name": "InfluxDB Test",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "2.0",
+        "url": "http://influxdb:8086",
+        "timeout": "10",
+        "rejectUnauthorized": true
+    },
+    {
         "id": "e4bcacc3334c7edb",
         "type": "mqtt in",
         "z": "96cdfc911e5f30a8",
         "name": "",
         "topic": "Testing",
-        "qos": "2",
+        "qos": "1",
         "datatype": "auto-detect",
         "broker": "de24aff89ea8a24b",
         "nl": false,
@@ -80,7 +103,9 @@
                 "f92c99b12b662c95",
                 "d777f82ef5d96b86",
                 "13180289d11a95a8",
-                "d2306a3dca7b1320"
+                "d2306a3dca7b1320",
+                "d560ed001752d308",
+                "80ebef6ac0590f94"
             ]
         ]
     },
@@ -513,6 +538,675 @@
             [
                 "5df8ca37cd22d5d0",
                 "fca26e21852167cb"
+            ]
+        ]
+    },
+    {
+        "id": "d560ed001752d308",
+        "type": "switch",
+        "z": "96cdfc911e5f30a8",
+        "name": "Status",
+        "property": "payload.status",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "OK",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Error - WiFi",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Error - BME/DHT",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Error - MS-WH-SP-RG",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Error - WH-SP-WS01",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Error - WH-SP-WD",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Error - MQTT",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 7,
+        "x": 430,
+        "y": 660,
+        "wires": [
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "80ebef6ac0590f94",
+        "type": "function",
+        "z": "96cdfc911e5f30a8",
+        "name": "Minus Temperature",
+        "func": "if (msg.payload.bme280_temp < 0 || msg.payload.dht22_temp < 0){\n    return \"Minus Temperature\";\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 760,
+        "wires": [
+            [
+                "fca26e21852167cb"
+            ]
+        ]
+    },
+    {
+        "id": "dd27228254a011ea",
+        "type": "mqtt in",
+        "z": "99587b48e67a75ad",
+        "name": "",
+        "topic": "Test",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "de24aff89ea8a24b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 50,
+        "y": 20,
+        "wires": [
+            [
+                "268f513df21a4950",
+                "b7589fb4975fa2e0",
+                "3cb4bd9a29f2a58d",
+                "17f06a0e868fd771",
+                "593618694662cd4a",
+                "9667f898fc2daa90",
+                "19c4be7afe98d52d",
+                "b601b3f939632e59",
+                "0d1d9c6f35b917bf",
+                "dd66bd05e2252580",
+                "528c843c1115666b",
+                "e401402bea597106",
+                "257f82b84558fdf7",
+                "b892e0011c0272d5"
+            ]
+        ]
+    },
+    {
+        "id": "b7589fb4975fa2e0",
+        "type": "change",
+        "z": "99587b48e67a75ad",
+        "name": "airTemperature - DHT22",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"celsius\":msg.payload.dht_temp\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation',\t        \"sensor\":'DHT22'\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 60,
+        "wires": [
+            [
+                "56ff16e1613aa547"
+            ]
+        ]
+    },
+    {
+        "id": "3cb4bd9a29f2a58d",
+        "type": "change",
+        "z": "99587b48e67a75ad",
+        "name": "airTemperature - BME280",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"celsius\":msg.payload.bme_temp\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation',\t        \"sensor\":'BME280'\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 100,
+        "wires": [
+            [
+                "56ff16e1613aa547"
+            ]
+        ]
+    },
+    {
+        "id": "17f06a0e868fd771",
+        "type": "change",
+        "z": "99587b48e67a75ad",
+        "name": "airHumidity - DHT22",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"percent\":msg.payload.dht_hum\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation',\t        \"sensor\":'DHT22'\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 480,
+        "y": 160,
+        "wires": [
+            [
+                "5ebd7f175c08378e"
+            ]
+        ]
+    },
+    {
+        "id": "268f513df21a4950",
+        "type": "debug",
+        "z": "99587b48e67a75ad",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 980,
+        "y": 20,
+        "wires": []
+    },
+    {
+        "id": "56ff16e1613aa547",
+        "type": "influxdb out",
+        "z": "99587b48e67a75ad",
+        "influxdb": "6939a609d9250890",
+        "name": "InfluxDB/airTemperature",
+        "measurement": "airTemperature",
+        "precision": "s",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "test",
+        "x": 1030,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "5ebd7f175c08378e",
+        "type": "influxdb out",
+        "z": "99587b48e67a75ad",
+        "influxdb": "6939a609d9250890",
+        "name": "InfluxDB/airHumidity",
+        "measurement": "airHumidity",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "test",
+        "x": 1020,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "801e2f381949459a",
+        "type": "influxdb out",
+        "z": "99587b48e67a75ad",
+        "influxdb": "6939a609d9250890",
+        "name": "InfluxDB/airPressure",
+        "measurement": "airPressure",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "test",
+        "x": 1020,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "73d84a26fa640815",
+        "type": "influxdb out",
+        "z": "99587b48e67a75ad",
+        "influxdb": "6939a609d9250890",
+        "name": "InfluxDB/batteryVoltage",
+        "measurement": "batteryVoltage",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "test",
+        "x": 1010,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "593618694662cd4a",
+        "type": "change",
+        "z": "99587b48e67a75ad",
+        "name": "airHumidity - BME280",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"percent\":msg.payload.bme_hum\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation',\t        \"sensor\":'BME280'\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 480,
+        "y": 200,
+        "wires": [
+            [
+                "5ebd7f175c08378e"
+            ]
+        ]
+    },
+    {
+        "id": "9667f898fc2daa90",
+        "type": "change",
+        "z": "99587b48e67a75ad",
+        "name": "airPressure- BME280",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"hPa\":msg.payload.bme_press\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation',\t        \"sensor\":'BME280'\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 480,
+        "y": 260,
+        "wires": [
+            [
+                "801e2f381949459a"
+            ]
+        ]
+    },
+    {
+        "id": "19c4be7afe98d52d",
+        "type": "change",
+        "z": "99587b48e67a75ad",
+        "name": "windSpeed-WH-SP-WS01",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"tips\":msg.payload.windSpeed_tips,\t       \"1Hz\":msg.payload.windSpeed_1Hz,\t       \"ms\":msg.payload.windSpeed_ms,\t       \"kmh\":msg.payload.windSpeed_kmh\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation',\t        \"sensor\":'WH-SP-WS01'\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 320,
+        "wires": [
+            [
+                "68756c1b542a2b29"
+            ]
+        ]
+    },
+    {
+        "id": "b601b3f939632e59",
+        "type": "change",
+        "z": "99587b48e67a75ad",
+        "name": "windDirection-WH-SP-WD",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"adc\":msg.payload.windDir_ADC,\t       \"deg\":msg.payload.windDir_deg,\t       \"name\":msg.payload.windDir_name\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation',\t        \"sensor\":'WH-SP-WD'\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 380,
+        "wires": [
+            [
+                "8d54a081b11941db"
+            ]
+        ]
+    },
+    {
+        "id": "0d1d9c6f35b917bf",
+        "type": "change",
+        "z": "99587b48e67a75ad",
+        "name": "rainGauge-MS-WH-SP-RG",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"tips\":msg.payload.rain_tips,\t       \"mm\":msg.payload.rain_mm\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation',\t        \"sensor\":'MS-WH-SP-RG'\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 500,
+        "y": 440,
+        "wires": [
+            [
+                "7cd048707b5b2388"
+            ]
+        ]
+    },
+    {
+        "id": "68756c1b542a2b29",
+        "type": "influxdb out",
+        "z": "99587b48e67a75ad",
+        "influxdb": "6939a609d9250890",
+        "name": "InfluxDB/windSpeed",
+        "measurement": "windSpeed",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "test",
+        "x": 1020,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "8d54a081b11941db",
+        "type": "influxdb out",
+        "z": "99587b48e67a75ad",
+        "influxdb": "6939a609d9250890",
+        "name": "InfluxDB/windDirection",
+        "measurement": "windDirection",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "test",
+        "x": 1020,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "7cd048707b5b2388",
+        "type": "influxdb out",
+        "z": "99587b48e67a75ad",
+        "influxdb": "6939a609d9250890",
+        "name": "InfluxDB/rainGauge",
+        "measurement": "rainGauge",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "test",
+        "x": 1010,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "dd66bd05e2252580",
+        "type": "change",
+        "z": "99587b48e67a75ad",
+        "name": "airDewPoint - BME280",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"celsius\":msg.payload.bme_temp - ((100 - msg.payload.bme_hum) / 5)\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation',\t        \"sensor\":'BME280'\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 480,
+        "y": 500,
+        "wires": [
+            [
+                "268f513df21a4950",
+                "37eacab2c207be5d"
+            ]
+        ]
+    },
+    {
+        "id": "37eacab2c207be5d",
+        "type": "influxdb out",
+        "z": "99587b48e67a75ad",
+        "influxdb": "6939a609d9250890",
+        "name": "InfluxDB/airDewPoint",
+        "measurement": "airDewPoint",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "test",
+        "x": 1020,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "528c843c1115666b",
+        "type": "change",
+        "z": "99587b48e67a75ad",
+        "name": "airDewPoint - DHT22",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"celsius\":msg.payload.dht_temp - ((100 - msg.payload.dht_hum) / 5)\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation',\t        \"sensor\":'DHT22'\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 480,
+        "y": 560,
+        "wires": [
+            [
+                "268f513df21a4950",
+                "37eacab2c207be5d"
+            ]
+        ]
+    },
+    {
+        "id": "e401402bea597106",
+        "type": "switch",
+        "z": "99587b48e67a75ad",
+        "name": "Status",
+        "property": "payload.status",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "OK",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Error:WiFi",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Error:BME/DHT",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Error:MS-WH-SP-RG",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Error:WH-SP-WS01",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Error:WH-SP-WD",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Error:MQTT",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 7,
+        "x": 430,
+        "y": 700,
+        "wires": [
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "257f82b84558fdf7",
+        "type": "function",
+        "z": "99587b48e67a75ad",
+        "name": "Minus Temperature",
+        "func": "var newMsg;\nif (msg.payload.bme280_temp < 0 || msg.payload.dht22_temp < 0){\n    newMsg = {\n        \"payload\": 'Minus Temperature'\n    }\n    return newMsg;\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 780,
+        "wires": [
+            [
+                "268f513df21a4950"
+            ]
+        ]
+    },
+    {
+        "id": "90c1df29459c6a9e",
+        "type": "influxdb out",
+        "z": "99587b48e67a75ad",
+        "influxdb": "6939a609d9250890",
+        "name": "InfluxDB/status",
+        "measurement": "status",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "test",
+        "x": 1000,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "b892e0011c0272d5",
+        "type": "change",
+        "z": "99587b48e67a75ad",
+        "name": "status",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"status\":msg.payload.status\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation'\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 430,
+        "y": 620,
+        "wires": [
+            [
+                "90c1df29459c6a9e"
             ]
         ]
     }
