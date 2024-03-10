@@ -37,7 +37,8 @@ warmSensor = 5
 errorTime = 300
 sendTime = 1800
 # MQTT ID for connect
-mqtt_client = ubinascii.hexlify(machine.unique_id())
+#mqtt_client = ubinascii.hexlify(machine.unique_id())
+mqtt_client = "MeteoStation00"
 mqtt_keepalive = 15
 # MQTT topic for publishing
 topic_pub = 'Testing'
