@@ -38,6 +38,7 @@ errorTime = 300
 sendTime = 1800
 # MQTT ID for connect
 mqtt_client = ubinascii.hexlify(machine.unique_id())
+mqtt_keepalive = 15
 # MQTT topic for publishing
 topic_pub = 'Testing'
 
@@ -207,7 +208,7 @@ pinWindDir_power.off()
     
 if sta_if.isconnected():
     try:
-        mqtt = MQTTClient(mqtt_client, auth.mqtt_host, auth.mqtt_port, auth.mqtt_user, auth.mqtt_pass)
+        mqtt = MQTTClient(mqtt_client, auth.mqtt_host, auth.mqtt_port, auth.mqtt_user, auth.mqtt_pass, mqtt_keepalive)
         mqtt.connect()
     except OSError as e:
         print('Cant connect to MQTT, error -' + e)
