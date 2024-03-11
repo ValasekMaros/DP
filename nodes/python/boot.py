@@ -29,4 +29,6 @@ ota_updater.download_and_install_update_if_available()
 sta_if.disconnect()
 sta_if.active(False)
 
+machine.freq(20000000)
+
 print('...boot...')
