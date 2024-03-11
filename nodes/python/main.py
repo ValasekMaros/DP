@@ -208,6 +208,8 @@ print('Wind Direction Deg:', windDir_deg)
 print('Wind Direction Name:', windDir_name)
 pinWindDir_power.off()
 
+machine.freq(80000000)
+
 sta_if.active(True)
 print('Wifi activated')
 sta_if.connect(auth.SSID_Name, auth.SSID_Pass)
