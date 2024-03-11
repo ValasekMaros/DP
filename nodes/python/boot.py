@@ -26,4 +26,7 @@ ota_updater = OTAUpdater(firmware_url, "main.py")
 
 ota_updater.download_and_install_update_if_available()
 
+sta_if.disconnect()
+sta_if.active(False)
+
 print('...boot...')
