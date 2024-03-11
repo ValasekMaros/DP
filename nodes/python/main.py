@@ -8,6 +8,7 @@ from umqttsimple import MQTTClient
 import BME280
 import dht
 import json
+import auth
 gc.collect()
 
 print('...main...')
@@ -206,6 +207,15 @@ for i in range(len(windDirDeg)):
 print('Wind Direction Deg:', windDir_deg)
 print('Wind Direction Name:', windDir_name)
 pinWindDir_power.off()
+
+sta_if.active(True)
+print('Wifi activated')
+sta_if.connect(auth.SSID_Name, auth.SSID_Pass)
+
+while not sta_if.isconnected():
+    pass
+print('Connection successful')
+print(sta_if.ifconfig())
     
 if sta_if.isconnected():
     try:
