@@ -8,6 +8,7 @@ from umqttsimple import MQTTClient
 import BME280
 import dht
 import json
+import ina219
 import auth
 gc.collect()
 
@@ -30,7 +31,8 @@ message = {
     "windSpeed_ms": None,
     "windDir_deg": None,
     "windDir_name": None,
-    "windDir_ADC": None	
+    "windDir_ADC": None,
+    "battery_voltage": None
 }
 
 # Sleep time(in seconds) for sleep after error and sleep after successful message send, and for warming sensors
@@ -40,9 +42,8 @@ sendTime = 3600
 # MQTT ID for connect
 #mqtt_client = ubinascii.hexlify(machine.unique_id())
 mqtt_client = "MeteoStation00"
-mqtt_keepalive = 15
 # MQTT topic for publishing
-topic_pub = 'Testing'
+topic_pub = 'project'
 
 calc_interval = 5000
 rain_debounce_time = 150
@@ -106,6 +107,14 @@ pinWindDir_power.on()
 pinRain_power.on()
 pinWindSpeed_power.on()
 machine.lightsleep(warmSensor * 1000)
+
+sensor = ina219.INA219(i2c, addr=0x40)
+sensor.set_calibration_16V_400mA()
+
+batteryVoltage = sensor.bus_voltage
+print("Bus voltage   / V: %8.3f" % (batteryVoltage))
+message['battery_voltage'] = batteryVoltage
+
 # --------------------------------------------------------------------------------------------
 # Need to add try: for exception
 try:
@@ -218,13 +227,13 @@ while not sta_if.isconnected():
     pass
 print('Connection successful')
 print(sta_if.ifconfig())
-    
+
 if sta_if.isconnected():
     try:
-        mqtt = MQTTClient(mqtt_client, auth.mqtt_host, auth.mqtt_port, auth.mqtt_user, auth.mqtt_pass, mqtt_keepalive)
+        mqtt = MQTTClient(mqtt_client, auth.mqtt_host, auth.mqtt_port, auth.mqtt_user, auth.mqtt_pass)
         mqtt.connect()
     except OSError as e:
-        print('Cant connect to MQTT, error -' + e)
+        print(e)
         endTime = time.time()
         cycleTime = endTime - zaciatok
         print('Cycle time:', cycleTime)
@@ -255,7 +264,7 @@ if sta_if.isconnected():
             machine.deepsleep((sendTime - cycleTime ) * 1000)
             machine.reset()
 else:
-    print('Cant connect to WiFi, error -', e)
+    print('Cant connect to WiFi, error')
     endTime = time.time()
     cycleTime = endTime - zaciatok
     print('Cycle time:', cycleTime)
