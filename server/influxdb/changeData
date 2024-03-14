@@ -1,0 +1,14 @@
+from(bucket: "Bucketv1")
+    |> range(start: 0)
+    |> filter(fn: (r) => r["_measurement"] == "Index Base")
+    |> filter(fn: (r) => r["CommandName"] == "Index Base")
+    |> filter(fn: (r) => r["_field"] == "Hook")
+    |> map(fn: (r) => ({
+        _time: r._time,
+        _measurement: "kWh",
+        _field: "value",
+        _value: r._value,
+        domain: "sensor",
+        entity_id: "hook_index_base"
+    }))
+    |> to(bucket: "Bucketv2")
