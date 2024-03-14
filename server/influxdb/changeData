@@ -1,14 +1,19 @@
-from(bucket: "Bucketv1")
-    |> range(start: 0)
-    |> filter(fn: (r) => r["_measurement"] == "Index Base")
-    |> filter(fn: (r) => r["CommandName"] == "Index Base")
-    |> filter(fn: (r) => r["_field"] == "Hook")
-    |> map(fn: (r) => ({
+from(bucket: "sensors")
+  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+  |> filter(fn: (r) => r["_measurement"] == "batteryVoltage")
+  |> filter(fn: (r) => r["_field"] == "Volt")
+  |> filter(fn: (r) => r["espID"] == "00")
+  |> filter(fn: (r) => r["place"] == "meteostation")
+  |> filter(fn: (r) => r["sensor"] == "INA219")
+  |> aggregateWindow(every: 1s, fn: mean, createEmpty: false)
+  |> yield(name: "mean")
+  |> map(fn: (r) => ({
         _time: r._time,
-        _measurement: "kWh",
-        _field: "value",
+        _measurement: "batteryVoltagev2",
+        _field: "Volt",
         _value: r._value,
-        domain: "sensor",
-        entity_id: "hook_index_base"
+        espID: "00",
+        place: "meteostation",
+        sensor: "INA219"
     }))
-    |> to(bucket: "Bucketv2")
+    |> to(bucket: "sensors")
