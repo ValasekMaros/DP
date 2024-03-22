@@ -45,7 +45,7 @@ mqtt_client = "MeteoStation00"
 # MQTT topic for publishing
 topic_pub = 'project'
 
-calc_interval = 5000
+calc_interval = 15000
 rain_debounce_time = 150
 wind_debounce_time = 125
 rainTrigger = 0
@@ -169,7 +169,7 @@ nextcalc = round(time.time_ns() / 1000000) + calc_interval
 #print('Start of rain sensor:', nextcalc)
 while True:
     timer = round(time.time_ns() / 1000000)
-    time.sleep(0.1)
+    #time.sleep(0.1)
     if timer >= nextcalc:
         print('Total Tips(Rain Gauge):', rainTrigger)
         try:
@@ -186,7 +186,7 @@ pinWindSpeed.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingWind)
 nextcalc = round(time.time_ns() / 1000000) + calc_interval 
 while True:
     timer = round(time.time_ns() / 1000000)
-    time.sleep(0.1)
+    #time.sleep(0.1)
     if timer >= nextcalc:
         print('Total Tips(Wind Speed):', windSpeedTrigger)
         try:
