@@ -223,8 +223,18 @@ sta_if.active(True)
 print('Wifi activated')
 sta_if.connect(auth.SSID_Name, auth.SSID_Pass)
 
+nextcalc = round(time.time_ns() / 1000000) + calc_interval
 while not sta_if.isconnected():
-    pass
+    timer = round(time.time_ns() / 1000000)
+    if timer >= nextcalc:
+        print('Cant connect to WiFi, error')
+        endTime = time.time()
+        cycleTime = endTime - zaciatok
+        print('Cycle time:', cycleTime)
+        print('Error sleep')
+        machine.deepsleep((errorTime - cycleTime) * 1000)
+        machine.reset()
+        
 print('Connection successful')
 print(sta_if.ifconfig())
 
@@ -233,6 +243,7 @@ if sta_if.isconnected():
         mqtt = MQTTClient(mqtt_client, auth.mqtt_host, auth.mqtt_port, auth.mqtt_user, auth.mqtt_pass)
         mqtt.connect()
     except OSError as e:
+        print('Problem with MQTT Connect, error')
         print(e)
         endTime = time.time()
         cycleTime = endTime - zaciatok
@@ -245,7 +256,8 @@ if sta_if.isconnected():
             print(message)
             mqtt.publish(topic_pub, json.dumps(message), False, 1)
         except OSError as e:
-            print('Problem with Publish, error -' + e)
+            print('Problem with Publish, error')
+            print(e)
             endTime = time.time()
             cycleTime = endTime - zaciatok
             print('Cycle time:', cycleTime)
