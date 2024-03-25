@@ -35,6 +35,9 @@ message = {
     "battery_voltage": None
 }
 
+rtc = machine.RTC()
+rtc.datetime((2000,01,01,01,0,0,0,0))
+
 # Sleep time(in seconds) for sleep after error and sleep after successful message send, and for warming sensors
 warmSensor = 5
 errorTime = 300
