@@ -36,6 +36,7 @@ message = {
 }
 
 rtc = machine.RTC()
+rtc.datetime((2000,01,01,5,0,0,0,0))
 
 # Sleep time(in seconds) for sleep after error and sleep after successful message send, and for warming sensors
 warmSensor = 5
@@ -175,12 +176,9 @@ else:
 #message['bmp_press'] = press_bmp180
 
 
-
 #pinBMP_power.off()
 pinBME_power.off()
 pinDHT_power.off()
-
-rtc.datetime((2000,01,01,5,0,0,0,0))
 
 pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
 nextcalc = round(time.time_ns() / 1000000) + calc_interval
@@ -199,8 +197,6 @@ while True:
 #print('End of rain sensor:', timer)
 pinRain.irq(None)
 pinRain_power.off()
-
-rtc.datetime((2000,01,01,5,0,0,0,0))
 
 pinWindSpeed.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingWind)
 nextcalc = round(time.time_ns() / 1000000) + calc_interval 
@@ -242,8 +238,6 @@ machine.freq(80000000)
 sta_if.active(True)
 print('Wifi activated')
 sta_if.connect(auth.SSID_Name, auth.SSID_Pass)
-
-rtc.datetime((2000,01,01,5,0,0,0,0))
 
 nextcalc = round(time.time_ns() / 1000000) + calc_interval
 while not sta_if.isconnected():
