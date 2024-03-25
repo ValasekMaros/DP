@@ -34,9 +34,10 @@ message = {
     "windDir_ADC": None,
     "battery_voltage": None
 }
-
+# Testing----------------------------------------------------------------------
 rtc = machine.RTC()
 rtc.datetime((2000,01,01,01,0,0,0,0))
+# Testing----------------------------------------------------------------------
 
 # Sleep time(in seconds) for sleep after error and sleep after successful message send, and for warming sensors
 warmSensor = 5
@@ -111,12 +112,23 @@ pinRain_power.on()
 pinWindSpeed_power.on()
 machine.lightsleep(warmSensor * 1000)
 
-sensor = ina219.INA219(i2c, addr=0x40)
-sensor.set_calibration_16V_400mA()
-
-batteryVoltage = sensor.bus_voltage
-print("Bus voltage   / V: %8.3f" % (batteryVoltage))
-message['battery_voltage'] = batteryVoltage
+try:
+    sensor = ina219.INA219(i2c, addr=0x40)
+    sensor.set_calibration_16V_400mA()
+except OSError as e:
+    print('Cand connect to INA219, error')
+    print(e)
+    endTime = time.time()
+    cycleTime = endTime - zaciatok
+    print('Cycle time:', cycleTime)
+    print('Error sleep')
+    machine.deepsleep((errorTime - cycleTime) * 1000)
+    machine.reset()
+else:
+    print('Connected to INA219')
+    batteryVoltage = sensor.bus_voltage
+    print("Bus voltage   / V: %8.3f" % (batteryVoltage))
+    message['battery_voltage'] = batteryVoltage
 
 # --------------------------------------------------------------------------------------------
 # Need to add try: for exception
