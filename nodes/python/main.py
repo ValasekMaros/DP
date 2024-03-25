@@ -35,13 +35,10 @@ message = {
     "battery_voltage": None
 }
 
-rtc = machine.RTC()
-rtc.datetime((2000,01,01,5,0,0,0,0))
-
 # Sleep time(in seconds) for sleep after error and sleep after successful message send, and for warming sensors
 warmSensor = 5
 errorTime = 300
-sendTime = 1800
+sendTime = 3600
 # MQTT ID for connect
 #mqtt_client = ubinascii.hexlify(machine.unique_id())
 mqtt_client = "MeteoStation00"
@@ -84,7 +81,6 @@ pinWindDir_power = machine.Pin(16, machine.Pin.OUT)
 # Functions
 def countingRain(pin):
     pinRain.irq(None)
-    rtc.datetime((2000,01,01,5,0,0,0,0))
     print('Interupt...')
     global rain_lastMicros
     global rain_debounce_time
@@ -96,7 +92,6 @@ def countingRain(pin):
 
 def countingWind(pin):
     print('Interupt...')
-    rtc.datetime((2000,01,01,5,0,0,0,0))
     global wind_lastMicros
     global wind_debounce_time
     global windSpeedTrigger
@@ -113,23 +108,12 @@ pinRain_power.on()
 pinWindSpeed_power.on()
 machine.lightsleep(warmSensor * 1000)
 
-try:
-    sensor = ina219.INA219(i2c, addr=0x40)
-    sensor.set_calibration_16V_400mA()
-except OSError as e:
-    print('Cand connect to INA219, error')
-    print(e)
-    endTime = time.time()
-    cycleTime = endTime - zaciatok
-    print('Cycle time:', cycleTime)
-    print('Error sleep')
-    machine.deepsleep(errorTime * 1000)
-    machine.reset()
-else:
-    print('Connected to INA219')
-    batteryVoltage = sensor.bus_voltage
-    print("Bus voltage   / V: %8.3f" % (batteryVoltage))
-    message['battery_voltage'] = batteryVoltage
+sensor = ina219.INA219(i2c, addr=0x40)
+sensor.set_calibration_16V_400mA()
+
+batteryVoltage = sensor.bus_voltage
+print("Bus voltage   / V: %8.3f" % (batteryVoltage))
+message['battery_voltage'] = batteryVoltage
 
 # --------------------------------------------------------------------------------------------
 # Need to add try: for exception
@@ -147,24 +131,10 @@ except OSError as e:
     cycleTime = endTime - zaciatok
     print('Cycle time:', cycleTime)
     print('Error sleep')
-    machine.deepsleep(errorTime * 1000)
+    machine.deepsleep((errorTime - cycleTime) * 1000)
     machine.reset()
 else:
     print('Connected to BME and DHT')
-    temp_bme280 = bme280.temperature
-    hum_bme280 = bme280.humidity
-    press_bme280 = bme280.pressure
-    print('BME:', temp_bme280, hum_bme280, press_bme280)
-    message['bme_temp'] = temp_bme280
-    message['bme_hum'] = hum_bme280
-    message['bme_press'] = press_bme280
-
-    dht22.measure()
-    temp_dht22 = dht22.temperature()
-    hum_dht22 = dht22.humidity()
-    print('DHT', temp_dht22, hum_dht22)
-    message['dht_temp'] = temp_dht22
-    message['dht_hum'] = hum_dht22
     
 # --------------------------------------------------------------------------------------------
 #bmp180.makegauge()
@@ -175,6 +145,20 @@ else:
 #message['bmp_temp'] = temp_bmp180
 #message['bmp_press'] = press_bmp180
 
+temp_bme280 = bme280.temperature
+hum_bme280 = bme280.humidity
+press_bme280 = bme280.pressure
+print('BME:', temp_bme280, hum_bme280, press_bme280)
+message['bme_temp'] = temp_bme280
+message['bme_hum'] = hum_bme280
+message['bme_press'] = press_bme280
+
+dht22.measure()
+temp_dht22 = dht22.temperature()
+hum_dht22 = dht22.humidity()
+print('DHT', temp_dht22, hum_dht22)
+message['dht_temp'] = temp_dht22
+message['dht_hum'] = hum_dht22
 
 #pinBMP_power.off()
 pinBME_power.off()
@@ -265,7 +249,7 @@ if sta_if.isconnected():
         cycleTime = endTime - zaciatok
         print('Cycle time:', cycleTime)
         print('Error sleep')
-        machine.deepsleep(errorTime * 1000)
+        machine.deepsleep((errorTime - cycleTime) * 1000)
         machine.reset()
     else:
         try:
@@ -278,7 +262,7 @@ if sta_if.isconnected():
             cycleTime = endTime - zaciatok
             print('Cycle time:', cycleTime)
             print('Error sleep')
-            machine.deepsleep(errorTime * 1000)
+            machine.deepsleep((errorTime - cycleTime) * 1000)
             machine.reset()
         else:
             print('Message send')
@@ -289,7 +273,7 @@ if sta_if.isconnected():
             cycleTime = endTime - zaciatok
             print('Cycle time:', cycleTime)
             print('Deep sleep after message')
-            machine.deepsleep(sendTime * 1000)
+            machine.deepsleep((sendTime - cycleTime ) * 1000)
             machine.reset()
 else:
     print('Cant connect to WiFi, error')
@@ -297,7 +281,6 @@ else:
     cycleTime = endTime - zaciatok
     print('Cycle time:', cycleTime)
     print('Error sleep')
-    machine.deepsleep(errorTime * 1000)
+    machine.deepsleep((errorTime - cycleTime) * 1000)
     machine.reset()
 print('...main...')
-machine.reset()
