@@ -246,10 +246,8 @@ print('Connection successful')
 print(sta_if.ifconfig())
 
 try:
-    ntptime.settime()
     rtc = machine.RTC()
     message['time_RTC'] = rtc.datetime()
-    message['time_nanoSecond'] = time.time_ns()
 except:
     pass
 else:
