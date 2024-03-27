@@ -36,7 +36,8 @@ message = {
     "battery_voltage": None,
     "time_timer": None,
     "time_nextCalc": None,
-    "time_RTC": None
+    "time_RTC": None,
+    "time_nanoSecond": None
 }
 
 # Sleep time(in seconds) for sleep after error and sleep after successful message send, and for warming sensors
@@ -248,6 +249,7 @@ try:
     ntptime.settime()
     rtc = machine.RTC()
     message['time_RTC'] = rtc.datetime()
+    message['time_nanoSecond'] = time.time_ns()
 except:
     pass
 else:
