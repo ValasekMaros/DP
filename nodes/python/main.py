@@ -10,6 +10,7 @@ import dht
 import json
 import ina219
 import auth
+import ntptime
 gc.collect()
 
 print('...main...')
@@ -34,7 +35,8 @@ message = {
     "windDir_ADC": None,
     "battery_voltage": None,
     "time_timer": None,
-    "time_nextCalc": None
+    "time_nextCalc": None,
+    "time_RTC": None
 }
 
 # Sleep time(in seconds) for sleep after error and sleep after successful message send, and for warming sensors
@@ -241,6 +243,15 @@ while not sta_if.isconnected():
         
 print('Connection successful')
 print(sta_if.ifconfig())
+
+try:
+    ntptime.settime()
+    rtc = machine.RTC()
+    message['time_RTC'] = rtc.datetime()
+except:
+    pass
+else:
+    print('RTC Updated')
 
 if sta_if.isconnected():
     try:
