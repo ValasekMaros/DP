@@ -32,13 +32,15 @@ message = {
     "windDir_deg": None,
     "windDir_name": None,
     "windDir_ADC": None,
-    "battery_voltage": None
+    "battery_voltage": None,
+    "time_timer": None,
+    "time_nextCalc": None
 }
 
 # Sleep time(in seconds) for sleep after error and sleep after successful message send, and for warming sensors
 warmSensor = 5
 errorTime = 300
-sendTime = 900
+sendTime = 300
 # MQTT ID for connect
 #mqtt_client = ubinascii.hexlify(machine.unique_id())
 mqtt_client = "MeteoStation00"
@@ -195,6 +197,8 @@ while True:
             message['windSpeed_1Hz'] = windSpeed_1Hz
             message['windSpeed_kmh'] = windSpeed_1Hz * 2.4
             message['windSpeed_ms'] = (windSpeed_1Hz * 2.4) / 3.6
+            message['time_timer'] = timer
+            message['time_nextCalc'] = nextcalc
         except:
             pass
         break
