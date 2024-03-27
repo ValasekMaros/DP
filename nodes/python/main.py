@@ -34,7 +34,8 @@ try:
         "windDir_deg": None,
         "windDir_name": None,
         "windDir_ADC": None,
-        "battery_voltage": None
+        "battery_voltage": None,
+        "RTC": None
     }
 
     # Sleep time(in seconds) for sleep after error and sleep after successful message send, and for warming sensors
@@ -80,6 +81,10 @@ try:
     pinWindDir_power = machine.Pin(16, machine.Pin.OUT)
     
     rtc = machine.RTC()
+    try:
+        message['RTC'] = rtc.datetime()
+    except:
+        pass
 
     # --------------------------------------------------------------------------------------------
     # Functions
