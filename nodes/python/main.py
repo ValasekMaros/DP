@@ -33,11 +33,7 @@ message = {
     "windDir_deg": None,
     "windDir_name": None,
     "windDir_ADC": None,
-    "battery_voltage": None,
-    "time_timer": None,
-    "time_nextCalc": None,
-    "time_RTC": None,
-    "time_nanoSecond": None
+    "battery_voltage": None
 }
 
 # Sleep time(in seconds) for sleep after error and sleep after successful message send, and for warming sensors
@@ -200,8 +196,6 @@ while True:
             message['windSpeed_1Hz'] = windSpeed_1Hz
             message['windSpeed_kmh'] = windSpeed_1Hz * 2.4
             message['windSpeed_ms'] = (windSpeed_1Hz * 2.4) / 3.6
-            message['time_timer'] = timer
-            message['time_nextCalc'] = nextcalc
         except:
             pass
         break
@@ -244,14 +238,6 @@ while not sta_if.isconnected():
         
 print('Connection successful')
 print(sta_if.ifconfig())
-
-try:
-    rtc = machine.RTC()
-    message['time_RTC'] = rtc.datetime()
-except:
-    pass
-else:
-    print('RTC Updated')
 
 if sta_if.isconnected():
     try:
