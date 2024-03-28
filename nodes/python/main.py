@@ -21,7 +21,7 @@ try:
     
     rtcData = {
         "time": None,
-        "presses": None
+        "presses": 0
     }
     
     message = {
