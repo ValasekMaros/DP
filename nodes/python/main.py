@@ -63,7 +63,7 @@ try:
     rain_sleep = False
     
     rtcDataTime = None
-    rtcDataPresses = None
+    rtcDataPresses = 0
 
     rain_lastMicros = 0
     wind_lastMicros = 0
