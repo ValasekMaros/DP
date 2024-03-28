@@ -19,6 +19,11 @@ try:
     importTime = startMainTime1 - endBootTime1
     print('Import time: ', importTime)
     
+    rtcData = {
+        "time": None,
+        "presses": None
+    }
+    
     message = {
         "espID": "00",
         #"bmp_temp": None,
@@ -39,7 +44,6 @@ try:
         "windDir_ADC": None,
         "battery_voltage": None
     }
-
     # Sleep time(in seconds) for sleep after error and sleep after successful message send, and for warming sensors
     warmSensor = 5
     errorTime = 300
@@ -53,11 +57,13 @@ try:
     calc_interval = 15000
     rain_debounce_time = 150
     wind_debounce_time = 125
-    rainTrigger = 0
     windSpeedTrigger = 0
     windDir_deg = 0
     windDir_name = None
     rain_sleep = False
+    
+    rtcDataTime = None
+    rtcDataPresses = None
 
     rain_lastMicros = 0
     wind_lastMicros = 0
@@ -90,15 +96,20 @@ try:
         print('Interupt...')
         global rain_lastMicros
         global rain_debounce_time
-        global rainTrigger
         global rain_sleep
+        global rtcDataTime
+        global rtcDataPresses
         if round(time.time_ns() / 1000) - rain_lastMicros >= rain_debounce_time * 1000:
-            rainTrigger += 1
+            rtcDataPresses += 1
             rain_lastMicros = round(time.time_ns() / 1000)
         if rain_sleep:
+            sleepTime = rtcDataTime - time.time()
             pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
             esp32.wake_on_ext0(pin = pinRain, level = esp32.WAKEUP_ALL_LOW)
-            machine.lightsleep()
+            rtcData["presses"] = rtcDataPresses
+            rtc.memory(json.dumps(rtcData))
+            machine.lightsleep(sleepTime * 1000)
+            machine.soft_reset()
             pass
         pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
 
@@ -111,6 +122,13 @@ try:
             windSpeedTrigger += 1
             wind_lastMicros = round(time.time_ns() / 1000)
     # --------------------------------------------------------------------------------------------
+    
+    try:
+        readData = json.loads(rtc.memory())
+        rtcDataTime = readData["time"]
+        rtcDataPresses = readData["presses"]
+    except:
+        pass
     
     pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
     # Powering BMP and DHT
@@ -202,7 +220,7 @@ try:
 
     #pinBMP_power.off()
     pinBME_power.off()
-    pinDHT_power.off()	
+    pinDHT_power.off()
     pinRain_power.off()
     
     print('Start of Wind Speed Measurement')
@@ -227,6 +245,7 @@ try:
     pinWindSpeed_power.off()
     print('End of Wind Speed Measurement')
     
+    print('Start of Wind Direction Measurement')
     pinWindDir_value = 0
     for i in range(8):
         pinWindDir_value += pinWindDir.read()
@@ -242,7 +261,8 @@ try:
     print('Wind Direction Deg:', windDir_deg)
     print('Wind Direction Name:', windDir_name)
     pinWindDir_power.off()
-
+    print('End of Wind Direction Measurement')
+    
     machine.freq(80000000)
 
     sta_if.active(True)
@@ -280,10 +300,11 @@ try:
         else:
             try:
                 pinRain.irq(None)
-                print('Total Tips(Rain Gauge):', rainTrigger)
+                print('Total Tips(Rain Gauge):', rtcDataPresses)
                 try:
-                    message['rain_tips'] = rainTrigger
-                    message['rain_mm'] = rainTrigger * 0.2794 / calc_interval * 3600000
+                    message['rain_tips'] = rtcDataPresses
+                    message['rain_mm'] = rtcDataPresses * 0.2794
+                    rtcDataPresses = 0
                 except:
                     pass
                 pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
@@ -308,12 +329,15 @@ try:
                 cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
                 print('Cycle time:', cycleTime)
                 rain_sleep = True
+                rtcData["time"] = time.time() + (sendTime - cycleTime)
+                rtcData["presses"] = rtcDataPresses
+                rtc.memory(json.dumps(rtcData))
                 esp32.wake_on_ext0(pin = pinRain, level = esp32.WAKEUP_ALL_LOW)
                 sta_if.disconnect()
                 sta_if.active(False)
                 print('Deep sleep after message')
-                machine.deepsleep((sendTime - cycleTime ) * 1000)
-                machine.reset()
+                machine.lightsleep((sendTime - cycleTime ) * 1000)
+                machine.soft_reset()
     else:
         print('Cant connect to WiFi, error')
         endMainTime1 = time.time()
