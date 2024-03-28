@@ -23,6 +23,11 @@ try:
         "time": None,
         "presses": 0
     }
+
+    try:
+        rtc.memory(json.dumps(rtcData))
+    except:
+        pass
     
     message = {
         "espID": "00",
