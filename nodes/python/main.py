@@ -24,11 +24,6 @@ try:
         "presses": 0
     }
 
-    try:
-        rtc.memory(json.dumps(rtcData))
-    except:
-        pass
-    
     message = {
         "espID": "00",
         #"bmp_temp": None,
