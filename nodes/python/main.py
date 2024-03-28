@@ -1,22 +1,249 @@
 try:
     import machine
-    import network
-    import auth
-    from ota import OTAUpdater
     import time
+    import os
+    import ubinascii
+    import gc
+    from umqttsimple import MQTTClient
+    #from bmp085 import BMP180
+    import BME280
+    import dht
+    import json
+    import ina219
+    import auth
+    import esp32
+    gc.collect()
     
-    machine.freq(80000000)
+    print('...main...')
+    startMainTime1 = time.time()
+    importTime = startMainTime1 - endBootTime1
+    print('Import time: ', importTime)
     
-    rtc = machine.RTC()
-    rtc.datetime([2000,1,1,5,0,0,0,0])
-    
-    print('...boot...')
-    startBootTime1 = time.time()
+    message = {
+        "espID": "00",
+        #"bmp_temp": None,
+        #"bmp_press": None,
+        "bme_temp": None,
+        "bme_hum": None,
+        "bme_press": None,
+        "dht_temp": None,
+        "dht_hum": None,
+        "rain_tips": None,
+        "rain_mm": None,
+        "windSpeed_tips": None,
+        "windSpeed_1Hz": None,
+        "windSpeed_kmh": None,
+        "windSpeed_ms": None,
+        "windDir_deg": None,
+        "windDir_name": None,
+        "windDir_ADC": None,
+        "battery_voltage": None
+    }
 
+    # Sleep time(in seconds) for sleep after error and sleep after successful message send, and for warming sensors
+    warmSensor = 5
     errorTime = 300
-    calc_interval = 15000
+    sendTime = 300
+    # MQTT ID for connect
+    #mqtt_client = ubinascii.hexlify(machine.unique_id())
+    mqtt_client = "MeteoStation00"
+    # MQTT topic for publishing
+    topic_pub = 'project'
 
-    sta_if = network.WLAN(network.STA_IF)
+    calc_interval = 15000
+    rain_debounce_time = 150
+    wind_debounce_time = 125
+    rainTrigger = 0
+    windSpeedTrigger = 0
+    windDir_deg = 0
+    windDir_name = None
+    rain_sleep = False
+
+    rain_lastMicros = 0
+    wind_lastMicros = 0
+
+    windDirMin = [2783, 1336, 1566, 167, 200, 104, 532, 320, 903, 746, 2371, 2045, 3723, 3224, 3278, 2579]
+    windDirMax = [3223, 1565, 1885, 205, 245, 128, 650, 392, 1103, 901, 2578, 2370, 4334, 3277, 3722, 2782]
+    windDirDeg = [0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, 202.5, 225, 247.5, 270, 292.5, 315, 337.5]
+    windDirName = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']
+    # --------------------------------------------------------------------------------------------
+    # Pins
+    i2c = machine.I2C(0, scl=machine.Pin(22), sda=machine.Pin(21), freq=10000)
+    pinDHT = machine.Pin(23)
+    pinRain = machine.Pin(34, machine.Pin.IN)
+    pinWindSpeed = machine.Pin(15, machine.Pin.IN)
+    pinWindDir = machine.ADC(machine.Pin(36))
+    pinWindDir.atten(machine.ADC.ATTN_11DB)
+
+    #pinBMP_power = machine.Pin(19, machine.Pin.OUT)
+    pinBME_power = machine.Pin(19, machine.Pin.OUT)
+    pinDHT_power = machine.Pin(18, machine.Pin.OUT)
+
+    pinRain_power = machine.Pin(5, machine.Pin.OUT)
+    pinWindSpeed_power = machine.Pin(17, machine.Pin.OUT)
+    pinWindDir_power = machine.Pin(16, machine.Pin.OUT)
+
+    # --------------------------------------------------------------------------------------------
+    # Functions
+    def countingRain(pin):
+        pinRain.irq(None)
+        print('Interupt...')
+        global rain_lastMicros
+        global rain_debounce_time
+        global rainTrigger
+        global rain_sleep
+        if round(time.time_ns() / 1000) - rain_lastMicros >= rain_debounce_time * 1000:
+            rainTrigger += 1
+            rain_lastMicros = round(time.time_ns() / 1000)
+        if rain_sleep:
+            pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
+            esp32.wake_on_ext0(pin = pinRain, level = esp32.WAKEUP_ALL_LOW)
+            machine.lightsleep()
+            pass
+        pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
+
+    def countingWind(pin):
+        print('Interupt...')
+        global wind_lastMicros
+        global wind_debounce_time
+        global windSpeedTrigger
+        if round(time.time_ns() / 1000) - wind_lastMicros >= wind_debounce_time * 1000:
+            windSpeedTrigger += 1
+            wind_lastMicros = round(time.time_ns() / 1000)
+    # --------------------------------------------------------------------------------------------
+    
+    pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
+    # Powering BMP and DHT
+    #pinBMP_power.on()
+    pinBME_power.on()
+    pinDHT_power.on()
+    pinWindDir_power.on()
+    pinRain_power.on()
+    pinWindSpeed_power.on()
+    machine.lightsleep(warmSensor * 1000)
+
+    try:
+        sensor = ina219.INA219(i2c, addr=0x40)
+        sensor.set_calibration_16V_400mA()
+    except OSError as e:
+        print('Cant connect to INA219, error')
+        print(e)
+        endMainTime1 = time.time()
+        cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
+        print('Cycle time:', cycleTime)
+        print('Error sleep')
+        machine.deepsleep((errorTime - cycleTime) * 1000)
+        machine.reset()
+    else:
+        print('Connected to INA219')
+        
+        batteryVoltage = sensor.bus_voltage
+        print("Bus voltage   / V: %8.3f" % (batteryVoltage))
+        message['battery_voltage'] = batteryVoltage
+
+    # --------------------------------------------------------------------------------------------
+    # Need to add try: for exception
+    try:
+        #bmp180 = BMP180(I2C)
+        #bmp180.oversample = 3
+        #bmp180.sealevel = 1013
+        bme280 = BME280.BME280(mode=3, address=0x77, i2c=i2c)
+        #bmp180.makegauge()
+    except OSError as e:
+        print('Cant connect to BME280, error')
+        print(e)
+        endMainTime1 = time.time()
+        cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
+        print('Cycle time:', cycleTime)
+        print('Error sleep')
+        machine.deepsleep((errorTime - cycleTime) * 1000)
+        machine.reset()
+    else:
+        print('Connected to BME280')
+        
+        temp_bme280 = bme280.temperature
+        hum_bme280 = bme280.humidity
+        press_bme280 = bme280.pressure
+        print('BME:', temp_bme280, hum_bme280, press_bme280)
+        message['bme_temp'] = temp_bme280
+        message['bme_hum'] = hum_bme280
+        message['bme_press'] = press_bme280
+        
+    try:
+        dht22 = dht.DHT22(pinDHT)
+        dht22.measure()
+    except OSError as e:
+        print('Cant connect to DHT22, error')
+        print(e)
+        endMainTime1 = time.time()
+        cycleTime = (endMainTime1 - startMainTime1) + bootTime
+        print('Cycle time:', cycleTime)
+        print('Error sleep')
+        machine.deepsleep((errorTime - cycleTime) * 1000)
+        machine.reset()
+    else:
+        print('Connected to DHT22')
+
+        dht22.measure()
+        temp_dht22 = dht22.temperature()
+        hum_dht22 = dht22.humidity()
+        print('DHT', temp_dht22, hum_dht22)
+        message['dht_temp'] = temp_dht22
+        message['dht_hum'] = hum_dht22
+
+    # --------------------------------------------------------------------------------------------
+    #bmp180.makegauge()
+    #temp_bmp180 = bmp180.temperature
+    #press_bmp180 = bmp180.pressure
+    #altitude_bmp180 = bmp180.altitude
+    #print('BMP:', temp_bmp180, press_bmp180, altitude_bmp180)
+    #message['bmp_temp'] = temp_bmp180
+    #message['bmp_press'] = press_bmp180
+
+    #pinBMP_power.off()
+    pinBME_power.off()
+    pinDHT_power.off()	
+    pinRain_power.off()
+    
+    print('Start of Wind Speed Measurement')
+    pinWindSpeed.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingWind)
+    nextcalc = round(time.time_ns() / 1000000) + calc_interval 
+    while True:
+        timer = round(time.time_ns() / 1000000)
+        #time.sleep(0.1)
+        if timer >= nextcalc:
+            print('Wind speed, measure interval: ',(timer - nextcalc) + calc_interval)
+            print('Total Tips(Wind Speed):', windSpeedTrigger)
+            try:
+                windSpeed_1Hz = windSpeedTrigger / calc_interval * 1000
+                message['windSpeed_tips'] = windSpeedTrigger
+                message['windSpeed_1Hz'] = windSpeed_1Hz
+                message['windSpeed_kmh'] = windSpeed_1Hz * 2.4
+                message['windSpeed_ms'] = (windSpeed_1Hz * 2.4) / 3.6
+            except:
+                pass
+            break
+    pinWindSpeed.irq(None)
+    pinWindSpeed_power.off()
+    print('End of Wind Speed Measurement')
+    
+    pinWindDir_value = 0
+    for i in range(8):
+        pinWindDir_value += pinWindDir.read()
+    pinWindDir_value /= 8
+    message['windDir_ADC'] = pinWindDir_value
+    for i in range(len(windDirDeg)):
+        if pinWindDir_value >= windDirMin[i] and pinWindDir_value <= windDirMax[i]:
+            windDir_deg = windDirDeg[i]
+            windDir_name = windDirName[i]
+            message['windDir_deg'] = windDir_deg
+            message['windDir_name'] = windDir_name
+            break
+    print('Wind Direction Deg:', windDir_deg)
+    print('Wind Direction Name:', windDir_name)
+    pinWindDir_power.off()
+
+    machine.freq(80000000)
 
     sta_if.active(True)
     print('Wifi activated')
@@ -27,30 +254,75 @@ try:
         timer = round(time.time_ns() / 1000000)
         if timer >= nextcalc:
             print('Cant connect to WiFi, error')
-            endTime = time.time()
-            cycleTime = endTime - startBootTime1
+            endMainTime1 = time.time()
+            cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
             print('Cycle time:', cycleTime)
             print('Error sleep')
             machine.deepsleep((errorTime - cycleTime) * 1000)
             machine.reset()
-
+            
     print('Connection successful')
     print(sta_if.ifconfig())
-  
-    firmware_url = "https://raw.githubusercontent.com/ValasekMaros/DP/main/nodes/python/"
 
-    ota_updater = OTAUpdater(firmware_url, "main.py")
-
-    ota_updater.download_and_install_update_if_available()
-
-    sta_if.disconnect()
-    sta_if.active(False)
-
-    machine.freq(20000000)
-    endBootTime1 = time.time()
-    bootTime = endBootTime1-startBootTime1
-    print('Boot Time: ', bootTime)
-    print('...boot...')
+    if sta_if.isconnected():
+        try:
+            mqtt = MQTTClient(mqtt_client, auth.mqtt_host, auth.mqtt_port, auth.mqtt_user, auth.mqtt_pass)
+            mqtt.connect()
+        except OSError as e:
+            print('Problem with MQTT Connect, error')
+            print(e)
+            endMainTime1 = time.time()
+            cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
+            print('Cycle time:', cycleTime)
+            print('Error sleep')
+            machine.deepsleep((errorTime - cycleTime) * 1000)
+            machine.reset()
+        else:
+            try:
+                pinRain.irq(None)
+                print('Total Tips(Rain Gauge):', rainTrigger)
+                try:
+                    message['rain_tips'] = rainTrigger
+                    message['rain_mm'] = rainTrigger * 0.2794 / calc_interval * 3600000
+                except:
+                    pass
+                pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
+                print(message)
+                mqtt.publish(topic_pub, json.dumps(message), False, 1)
+            except OSError as e:
+                print('Problem with Publish, error')
+                print(e)
+                endMainTime1 = time.time()
+                cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
+                print('Cycle time:', cycleTime)
+                print('Error sleep')
+                machine.deepsleep((errorTime - cycleTime) * 1000)
+                machine.reset()
+            else:
+                print('Message send')
+                try:
+                    mqtt.disconnect()
+                except:
+                    pass
+                endMainTime1 = time.time()
+                cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
+                print('Cycle time:', cycleTime)
+                rain_sleep = True
+                esp32.wake_on_ext0(pin = pinRain, level = esp32.WAKEUP_ALL_LOW)
+                sta_if.disconnect()
+                sta_if.active(False)
+                print('Deep sleep after message')
+                machine.deepsleep((sendTime - cycleTime ) * 1000)
+                machine.reset()
+    else:
+        print('Cant connect to WiFi, error')
+        endMainTime1 = time.time()
+        cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
+        print('Cycle time:', cycleTime)
+        print('Error sleep')
+        machine.deepsleep((errorTime - cycleTime) * 1000)
+        machine.reset()
+    print('...main...')
 except Exception as E:
     print('Internal Error...')
     print(E)
