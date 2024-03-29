@@ -152,7 +152,6 @@ try:
         sensor = ina219.INA219(i2c, addr=0x40)
         sensor.set_calibration_16V_400mA()
     except OSError as e:
-        """
         print('Cant connect to INA219, error')
         print(e)
         endMainTime1 = time.time()
@@ -161,7 +160,6 @@ try:
         print('Error sleep')
         machine.deepsleep((errorTime - cycleTime) * 1000)
         machine.reset()
-        """
     else:
         print('Connected to INA219')
         
@@ -178,7 +176,6 @@ try:
         bme280 = BME280.BME280(mode=3, address=0x77, i2c=i2c)
         #bmp180.makegauge()
     except OSError as e:
-        """
         print('Cant connect to BME280, error')
         print(e)
         endMainTime1 = time.time()
@@ -187,7 +184,6 @@ try:
         print('Error sleep')
         machine.deepsleep((errorTime - cycleTime) * 1000)
         machine.reset()
-        """
     else:
         print('Connected to BME280')
         
@@ -203,7 +199,6 @@ try:
         dht22 = dht.DHT22(pinDHT)
         dht22.measure()
     except OSError as e:
-        """
         print('Cant connect to DHT22, error')
         print(e)
         endMainTime1 = time.time()
@@ -212,7 +207,6 @@ try:
         print('Error sleep')
         machine.deepsleep((errorTime - cycleTime) * 1000)
         machine.reset()
-        """
     else:
         print('Connected to DHT22')
 
@@ -374,6 +368,10 @@ try:
         machine.reset()
     print('...main...')
 except Exception as E:
-    print('Internal Error...')
+    print('Error(Exception)...')
     print(E)
+    machine.reset()
+except OSError as e:
+    print('Error(OSError)...')
+    print(e)
     machine.reset()
