@@ -51,7 +51,7 @@ try:
     #mqtt_client = ubinascii.hexlify(machine.unique_id())
     mqtt_client = "MeteoStation00"
     # MQTT topic for publishing
-    topic_pub = 'Test'
+    topic_pub = 'project'
 
     calc_interval = 15000
     rain_debounce_time = 150
