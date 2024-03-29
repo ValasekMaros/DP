@@ -20,10 +20,9 @@ try:
     print('Import time: ', importTime)
     
     rtcData = {
-        "time": None,
-        "presses": 0
+        "presses": None
     }
-
+    
     message = {
         "espID": "00",
         #"bmp_temp": None,
@@ -52,7 +51,7 @@ try:
     #mqtt_client = ubinascii.hexlify(machine.unique_id())
     mqtt_client = "MeteoStation00"
     # MQTT topic for publishing
-    topic_pub = 'project'
+    topic_pub = 'Test'
 
     calc_interval = 15000
     rain_debounce_time = 150
@@ -61,9 +60,8 @@ try:
     windDir_deg = 0
     windDir_name = None
     rain_sleep = False
-    
-    rtcDataTime = None
     rtcDataPresses = 0
+    spin = 0
 
     rain_lastMicros = 0
     wind_lastMicros = 0
@@ -97,20 +95,30 @@ try:
         global rain_lastMicros
         global rain_debounce_time
         global rain_sleep
-        global rtcDataTime
         global rtcDataPresses
+        global spin
         if round(time.time_ns() / 1000) - rain_lastMicros >= rain_debounce_time * 1000:
             rtcDataPresses += 1
             rain_lastMicros = round(time.time_ns() / 1000)
+        print('rain_sleep: ', rain_sleep)
         if rain_sleep:
-            sleepTime = rtcDataTime - time.time()
+            try:
+                rtcData["presses"] = rtcDataPresses
+                rtc.memory(json.dumps(rtcData))
+            except:
+                pass
+            else:
+                print('rtcData Saved')
+            sleepTime = sendTime - time.time()
             pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
             esp32.wake_on_ext0(pin = pinRain, level = esp32.WAKEUP_ALL_LOW)
-            rtcData["presses"] = rtcDataPresses
-            rtc.memory(json.dumps(rtcData))
             machine.lightsleep(sleepTime * 1000)
-            machine.soft_reset()
-            pass
+            while True:
+                spin += 1
+                print('spin: ', spin)
+                if spin > 15:
+                    spin = 0
+                    break
         pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
 
     def countingWind(pin):
@@ -125,8 +133,8 @@ try:
     
     try:
         readData = json.loads(rtc.memory())
-        rtcDataTime = readData["time"]
         rtcDataPresses = readData["presses"]
+        print('rtcDataPresses: ', rtcDataPresses)
     except:
         pass
     
@@ -144,6 +152,7 @@ try:
         sensor = ina219.INA219(i2c, addr=0x40)
         sensor.set_calibration_16V_400mA()
     except OSError as e:
+        """
         print('Cant connect to INA219, error')
         print(e)
         endMainTime1 = time.time()
@@ -152,6 +161,7 @@ try:
         print('Error sleep')
         machine.deepsleep((errorTime - cycleTime) * 1000)
         machine.reset()
+        """
     else:
         print('Connected to INA219')
         
@@ -168,6 +178,7 @@ try:
         bme280 = BME280.BME280(mode=3, address=0x77, i2c=i2c)
         #bmp180.makegauge()
     except OSError as e:
+        """
         print('Cant connect to BME280, error')
         print(e)
         endMainTime1 = time.time()
@@ -176,6 +187,7 @@ try:
         print('Error sleep')
         machine.deepsleep((errorTime - cycleTime) * 1000)
         machine.reset()
+        """
     else:
         print('Connected to BME280')
         
@@ -191,6 +203,7 @@ try:
         dht22 = dht.DHT22(pinDHT)
         dht22.measure()
     except OSError as e:
+        """
         print('Cant connect to DHT22, error')
         print(e)
         endMainTime1 = time.time()
@@ -199,6 +212,7 @@ try:
         print('Error sleep')
         machine.deepsleep((errorTime - cycleTime) * 1000)
         machine.reset()
+        """
     else:
         print('Connected to DHT22')
 
@@ -302,6 +316,8 @@ try:
                 pinRain.irq(None)
                 print('Total Tips(Rain Gauge):', rtcDataPresses)
                 try:
+                    print('rtcDataPresses: ', rtcDataPresses)
+                    print('message["rain_tips"]: ', message['rain_tips'])
                     message['rain_tips'] = rtcDataPresses
                     message['rain_mm'] = rtcDataPresses * 0.2794
                     rtcDataPresses = 0
@@ -328,16 +344,26 @@ try:
                 endMainTime1 = time.time()
                 cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
                 print('Cycle time:', cycleTime)
-                rain_sleep = True
-                rtcData["time"] = time.time() + (sendTime - cycleTime)
                 rtcData["presses"] = rtcDataPresses
-                rtc.memory(json.dumps(rtcData))
+                print('rtcDataPresses: ', rtcDataPresses)
+                try:
+                    rtc.memory(json.dumps(rtcData))
+                except:
+                    pass
+                rain_sleep = True
                 esp32.wake_on_ext0(pin = pinRain, level = esp32.WAKEUP_ALL_LOW)
                 sta_if.disconnect()
                 sta_if.active(False)
-                print('Deep sleep after message')
+                print('Sleep after message')
+                print((sendTime - cycleTime ) * 1000)
                 machine.lightsleep((sendTime - cycleTime ) * 1000)
-                machine.soft_reset()
+                while True:
+                    spin += 1
+                    time.sleep(0.1)
+                    print('spin: ', spin)
+                    if spin > 15:
+                        spin = 0
+                        machine.soft_reset()
     else:
         print('Cant connect to WiFi, error')
         endMainTime1 = time.time()
