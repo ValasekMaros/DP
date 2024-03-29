@@ -114,7 +114,7 @@ try:
                 time.sleep(1)
                 print('rtcData Saved')
             sleepTime = sendTime - time.time()
-            pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
+            pinRain.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingRain)
             esp32.wake_on_ext0(pin = pinRain, level = esp32.WAKEUP_ALL_LOW)
             machine.lightsleep(sleepTime * 1000)
             while True:
@@ -123,7 +123,7 @@ try:
                 if spin > 15:
                     spin = 0
                     break
-        pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
+        pinRain.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingRain)
 
     def countingWind(pin):
         print('Interupt...')
@@ -142,7 +142,7 @@ try:
     except:
         pass
     
-    pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
+    pinRain.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingRain)
     # Powering BMP and DHT
     #pinBMP_power.on()
     pinBME_power.on()
@@ -340,7 +340,7 @@ try:
                     rtcDataPresses = 0
                 except:
                     pass
-                pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
+                pinRain.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingRain)
                 print(message)
                 mqtt.publish(topic_pub, json.dumps(message), False, 1)
             except OSError as e:
