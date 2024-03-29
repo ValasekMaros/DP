@@ -69,10 +69,16 @@ try:
     rain_lastMicros = 0
     wind_lastMicros = 0
 
-    windDirMin = [2783, 1336, 1566, 167, 200, 104, 532, 320, 903, 746, 2371, 2045, 3723, 3224, 3278, 2579]
-    windDirMax = [3223, 1565, 1885, 205, 245, 128, 650, 392, 1103, 901, 2578, 2370, 4334, 3277, 3722, 2782]
+    '''
+    # Values before rotation for our use (90 degree rotation)
     windDirDeg = [0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, 202.5, 225, 247.5, 270, 292.5, 315, 337.5]
     windDirName = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']
+    '''
+    windDirMin = [2783, 1336, 1566, 167, 200, 104, 532, 320, 903, 746, 2371, 2045, 3723, 3224, 3278, 2579]
+    windDirMax = [3223, 1565, 1885, 205, 245, 128, 650, 392, 1103, 901, 2578, 2370, 4334, 3277, 3722, 2782]
+    windDirDeg = [90, 112.5, 135, 157.5, 180, 202.5, 225, 247.5, 270, 292.5, 315, 337.5, 0, 22.5, 45, 67.5]
+    windDirName = ['E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW', 'N', 'NNE', 'NE', 'ENE']
+    
     # --------------------------------------------------------------------------------------------
     # Pins
     i2c = machine.I2C(0, scl=machine.Pin(22), sda=machine.Pin(21), freq=10000)
@@ -111,8 +117,8 @@ try:
             except:
                 pass
             else:
-                time.sleep(1)
                 print('rtcData Saved')
+            time.sleep(1)
             sleepTime = sendTime - time.time()
             pinRain.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingRain)
             esp32.wake_on_ext0(pin = pinRain, level = esp32.WAKEUP_ALL_LOW)
@@ -367,6 +373,7 @@ try:
                     rtc.memory(json.dumps(rtcData))
                 except:
                     pass
+                time.sleep(0.25)
                 rain_sleep = True
                 esp32.wake_on_ext0(pin = pinRain, level = esp32.WAKEUP_ALL_LOW)
                 sta_if.disconnect()
