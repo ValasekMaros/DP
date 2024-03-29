@@ -41,7 +41,10 @@ try:
         "windDir_deg": None,
         "windDir_name": None,
         "windDir_ADC": None,
-        "battery_voltage": None
+        "battery_voltage": None,
+        "status_ina219": "OK",
+        "status_bme280": "OK",
+        "status_dht22": "OK"
     }
     # Sleep time(in seconds) for sleep after error and sleep after successful message send, and for warming sensors
     warmSensor = 5
@@ -154,12 +157,16 @@ try:
     except OSError as e:
         print('Cant connect to INA219, error')
         print(e)
+        message['status_ina219'] = "Error"
+        message['battery_voltage'] = 999
+        '''
         endMainTime1 = time.time()
         cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
         print('Cycle time:', cycleTime)
         print('Error sleep')
         machine.deepsleep((errorTime - cycleTime) * 1000)
         machine.reset()
+        '''
     else:
         print('Connected to INA219')
         
@@ -178,12 +185,19 @@ try:
     except OSError as e:
         print('Cant connect to BME280, error')
         print(e)
+        message['status_bme280'] = "Error"
+        message['bme_temp'] = 999
+        message['bme_hum'] = 999
+        message['bme_press'] = 0
+        
+        '''
         endMainTime1 = time.time()
         cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
         print('Cycle time:', cycleTime)
         print('Error sleep')
         machine.deepsleep((errorTime - cycleTime) * 1000)
         machine.reset()
+        '''
     else:
         print('Connected to BME280')
         
@@ -201,12 +215,17 @@ try:
     except OSError as e:
         print('Cant connect to DHT22, error')
         print(e)
+        message['status_dht22'] = "Error"
+        message['dht_temp'] = 999
+        message['dht_hum'] = 999
+        '''
         endMainTime1 = time.time()
         cycleTime = (endMainTime1 - startMainTime1) + bootTime
         print('Cycle time:', cycleTime)
         print('Error sleep')
         machine.deepsleep((errorTime - cycleTime) * 1000)
         machine.reset()
+        '''
     else:
         print('Connected to DHT22')
 
@@ -266,6 +285,9 @@ try:
             message['windDir_deg'] = windDir_deg
             message['windDir_name'] = windDir_name
             break
+    else:
+        message['windDir_deg'] = 999
+        message['windDir_name'] = 'Error'
     print('Wind Direction Deg:', windDir_deg)
     print('Wind Direction Name:', windDir_name)
     pinWindDir_power.off()
