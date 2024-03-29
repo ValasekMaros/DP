@@ -77,7 +77,7 @@ try:
     # Pins
     i2c = machine.I2C(0, scl=machine.Pin(22), sda=machine.Pin(21), freq=10000)
     pinDHT = machine.Pin(23)
-    pinRain = machine.Pin(34, machine.Pin.IN)
+    pinRain = machine.Pin(34, machine.Pin.IN, machine.Pin.PULL_DOWN)
     pinWindSpeed = machine.Pin(15, machine.Pin.IN)
     pinWindDir = machine.ADC(machine.Pin(36))
     pinWindDir.atten(machine.ADC.ATTN_11DB)
@@ -111,6 +111,7 @@ try:
             except:
                 pass
             else:
+                time.sleep(1)
                 print('rtcData Saved')
             sleepTime = sendTime - time.time()
             pinRain.irq(trigger=machine.Pin.IRQ_RISING, handler=countingRain)
@@ -332,8 +333,8 @@ try:
                 pinRain.irq(None)
                 print('Total Tips(Rain Gauge):', rtcDataPresses)
                 try:
-                    print('rtcDataPresses: ', rtcDataPresses)
-                    print('message["rain_tips"]: ', message['rain_tips'])
+                    #print('rtcDataPresses: ', rtcDataPresses)
+                    #print('message["rain_tips"]: ', message['rain_tips'])
                     message['rain_tips'] = rtcDataPresses
                     message['rain_mm'] = rtcDataPresses * 0.2794
                     rtcDataPresses = 0
