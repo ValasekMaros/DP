@@ -282,9 +282,9 @@ try:
     
     print('Start of Wind Direction Measurement')
     pinWindDir_value = 0
-    for i in range(range):
+    for i in range(2):
         pinWindDir_value += pinWindDir.read()
-    pinWindDir_value /= range
+    pinWindDir_value /= 2
     message['windDir_ADC'] = pinWindDir_value
     for i in range(len(windDirDeg)):
         if pinWindDir_value >= windDirMin[i] and pinWindDir_value <= windDirMax[i]:
