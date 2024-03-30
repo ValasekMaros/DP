@@ -59,6 +59,7 @@ try:
     calc_interval = 15000
     rain_debounce_time = 150
     wind_debounce_time = 125
+    range = 1
     windSpeedTrigger = 0
     windDir_deg = 0
     windDir_name = None
@@ -281,9 +282,9 @@ try:
     
     print('Start of Wind Direction Measurement')
     pinWindDir_value = 0
-    for i in range(8):
+    for i in range(range):
         pinWindDir_value += pinWindDir.read()
-    pinWindDir_value /= 8
+    pinWindDir_value /= range
     message['windDir_ADC'] = pinWindDir_value
     for i in range(len(windDirDeg)):
         if pinWindDir_value >= windDirMin[i] and pinWindDir_value <= windDirMax[i]:
