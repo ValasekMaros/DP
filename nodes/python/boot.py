@@ -50,8 +50,10 @@ try:
 
     sta_if.disconnect()
     sta_if.active(False)
-
-    machine.freq(20000000)
+    try:
+        machine.freq(20000000)
+    except:
+        pass
     endBootTime1 = time.time()
     bootTime = endBootTime1-startBootTime1
     print('Boot Time: ', bootTime)
