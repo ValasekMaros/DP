@@ -387,6 +387,9 @@ try:
                 try:
                     sta_if.disconnect()
                     sta_if.active(False)
+                except:
+                    pass
+                try:
                     machine.freq(20000000)
                 except:
                     pass
