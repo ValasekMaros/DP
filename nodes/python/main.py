@@ -14,6 +14,11 @@ try:
     import esp32
     gc.collect()
     
+    try:
+        machine.freq(20000000)
+    except:
+        pass
+    
     print('...main...')
     startMainTime1 = time.time()
     importTime = startMainTime1 - endBootTime1
@@ -59,7 +64,7 @@ try:
     calc_interval = 15000
     rain_debounce_time = 150
     wind_debounce_time = 125
-    range = 1
+    windDirCycle = 1
     windSpeedTrigger = 0
     windDir_deg = 0
     windDir_name = None
@@ -282,9 +287,9 @@ try:
     
     print('Start of Wind Direction Measurement')
     pinWindDir_value = 0
-    for i in range(2):
+    for i in range(windDirCycle):
         pinWindDir_value += pinWindDir.read()
-    pinWindDir_value /= 2
+    pinWindDir_value /= windDirCycle
     message['windDir_ADC'] = pinWindDir_value
     for i in range(len(windDirDeg)):
         if pinWindDir_value >= windDirMin[i] and pinWindDir_value <= windDirMax[i]:
@@ -301,8 +306,10 @@ try:
     pinWindDir_power.off()
     print('End of Wind Direction Measurement')
     
-    machine.freq(80000000)
-
+    try:
+        machine.freq(80000000)
+    except:
+        pass
     sta_if.active(True)
     print('Wifi activated')
     sta_if.connect(auth.SSID_Name, auth.SSID_Pass)
@@ -377,8 +384,12 @@ try:
                 time.sleep(0.25)
                 rain_sleep = True
                 esp32.wake_on_ext0(pin = pinRain, level = esp32.WAKEUP_ALL_LOW)
-                sta_if.disconnect()
-                sta_if.active(False)
+                try:
+                    sta_if.disconnect()
+                    sta_if.active(False)
+                    machine.freq(20000000)
+                except:
+                    pass
                 print('Sleep after message')
                 print((sendTime - cycleTime ) * 1000)
                 machine.lightsleep((sendTime - cycleTime ) * 1000)
