@@ -5,10 +5,15 @@ try:
     from ota import OTAUpdater
     import time
     
-    machine.freq(80000000)
-    
-    rtc = machine.RTC()
-    rtc.datetime([2000,1,1,5,0,0,0,0])
+    try:
+        machine.freq(80000000)
+    except:
+        pass
+    try:
+        rtc = machine.RTC()
+        rtc.datetime([2000,1,1,5,0,0,0,0])
+    except:
+        pass
     
     print('...boot...')
     startBootTime1 = time.time()
