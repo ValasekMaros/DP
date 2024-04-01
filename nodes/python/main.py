@@ -47,6 +47,7 @@ try:
         "windDir_name": None,
         "windDir_ADC": None,
         "battery_voltage": None,
+        "status_wifimqtt": "OK",
         "status_ina219": "OK",
         "status_bme280": "OK",
         "status_dht22": "OK"
@@ -171,7 +172,7 @@ try:
         print('Cant connect to INA219, error')
         print(e)
         message['status_ina219'] = "Error"
-        message['battery_voltage'] = 999
+        message['battery_voltage'] = None
         '''
         endMainTime1 = time.time()
         cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
@@ -199,9 +200,9 @@ try:
         print('Cant connect to BME280, error')
         print(e)
         message['status_bme280'] = "Error"
-        message['bme_temp'] = 999
-        message['bme_hum'] = 999
-        message['bme_press'] = 0
+        message['bme_temp'] = None
+        message['bme_hum'] = None
+        message['bme_press'] = None
         
         '''
         endMainTime1 = time.time()
@@ -229,8 +230,8 @@ try:
         print('Cant connect to DHT22, error')
         print(e)
         message['status_dht22'] = "Error"
-        message['dht_temp'] = 999
-        message['dht_hum'] = 999
+        message['dht_temp'] = None
+        message['dht_hum'] = None
         '''
         endMainTime1 = time.time()
         cycleTime = (endMainTime1 - startMainTime1) + bootTime
@@ -299,7 +300,7 @@ try:
             message['windDir_name'] = windDir_name
             break
     else:
-        message['windDir_deg'] = 999
+        message['windDir_deg'] = None
         message['windDir_name'] = 'Error'
     print('Wind Direction Deg:', windDir_deg)
     print('Wind Direction Name:', windDir_name)
@@ -310,10 +311,13 @@ try:
         machine.freq(80000000)
     except:
         pass
-    sta_if.active(True)
-    print('Wifi activated')
-    sta_if.connect(auth.SSID_Name, auth.SSID_Pass)
-
+    try:
+        sta_if.active(True)
+        print('Wifi activated')
+        sta_if.connect(auth.SSID_Name, auth.SSID_Pass)
+    except:
+        machine.reset()
+        
     nextcalc = round(time.time_ns() / 1000000) + calc_interval
     while not sta_if.isconnected():
         timer = round(time.time_ns() / 1000000)
