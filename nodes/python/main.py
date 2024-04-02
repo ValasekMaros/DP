@@ -150,7 +150,7 @@ try:
             wind_lastMicros = round(time.time_ns() / 1000)
         if timer >= nextcalc:
             pinWindSpeed_power.off()
-            break
+            return
     # --------------------------------------------------------------------------------------------
     
     try:
