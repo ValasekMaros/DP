@@ -47,6 +47,7 @@ try:
         "windDir_name": None,
         "windDir_ADC": None,
         "battery_voltage": None,
+        "status_wifimqtt": "OK",
         "status_ina219": "OK",
         "status_bme280": "OK",
         "status_dht22": "OK"
@@ -81,7 +82,7 @@ try:
     windDirName = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']
     '''
     windDirMin = [2783, 1336, 1566, 167, 200, 104, 532, 320, 903, 746, 2371, 2045, 3723, 3224, 3278, 2579]
-    windDirMax = [3223, 1565, 1885, 205, 245, 128, 650, 392, 1103, 901, 2578, 2370, 4334, 3277, 3722, 2782]
+    windDirMax = [3223, 1565, 1885, 202, 245, 128, 650, 392, 1103, 901, 2578, 2370, 4334, 3277, 3722, 2782]
     windDirDeg = [90, 112.5, 135, 157.5, 180, 202.5, 225, 247.5, 270, 292.5, 315, 337.5, 0, 22.5, 45, 67.5]
     windDirName = ['E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW', 'N', 'NNE', 'NE', 'ENE']
     
@@ -142,9 +143,14 @@ try:
         global wind_lastMicros
         global wind_debounce_time
         global windSpeedTrigger
+        global timer
+        global nextcalc
         if round(time.time_ns() / 1000) - wind_lastMicros >= wind_debounce_time * 1000:
             windSpeedTrigger += 1
             wind_lastMicros = round(time.time_ns() / 1000)
+        if timer >= nextcalc:
+            pinWindSpeed_power.off()
+            break
     # --------------------------------------------------------------------------------------------
     
     try:
@@ -171,7 +177,7 @@ try:
         print('Cant connect to INA219, error')
         print(e)
         message['status_ina219'] = "Error"
-        message['battery_voltage'] = 999
+        message['battery_voltage'] = None
         '''
         endMainTime1 = time.time()
         cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
@@ -199,9 +205,9 @@ try:
         print('Cant connect to BME280, error')
         print(e)
         message['status_bme280'] = "Error"
-        message['bme_temp'] = 999
-        message['bme_hum'] = 999
-        message['bme_press'] = 0
+        message['bme_temp'] = None
+        message['bme_hum'] = None
+        message['bme_press'] = None
         
         '''
         endMainTime1 = time.time()
@@ -229,8 +235,8 @@ try:
         print('Cant connect to DHT22, error')
         print(e)
         message['status_dht22'] = "Error"
-        message['dht_temp'] = 999
-        message['dht_hum'] = 999
+        message['dht_temp'] = None
+        message['dht_hum'] = None
         '''
         endMainTime1 = time.time()
         cycleTime = (endMainTime1 - startMainTime1) + bootTime
@@ -264,12 +270,16 @@ try:
     pinRain_power.off()
     
     print('Start of Wind Speed Measurement')
-    pinWindSpeed.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingWind)
     nextcalc = round(time.time_ns() / 1000000) + calc_interval 
+    windSpeedStart = 1
     while True:
+        if windSpeedStart:
+            pinWindSpeed.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingWind)
+            windSpeedStart = 0
         timer = round(time.time_ns() / 1000000)
         #time.sleep(0.1)
         if timer >= nextcalc:
+            pinWindSpeed_power.off()
             print('Wind speed, measure interval: ',(timer - nextcalc) + calc_interval)
             print('Total Tips(Wind Speed):', windSpeedTrigger)
             try:
@@ -282,7 +292,6 @@ try:
                 pass
             break
     pinWindSpeed.irq(None)
-    pinWindSpeed_power.off()
     print('End of Wind Speed Measurement')
     
     print('Start of Wind Direction Measurement')
@@ -299,7 +308,7 @@ try:
             message['windDir_name'] = windDir_name
             break
     else:
-        message['windDir_deg'] = 999
+        message['windDir_deg'] = None
         message['windDir_name'] = 'Error'
     print('Wind Direction Deg:', windDir_deg)
     print('Wind Direction Name:', windDir_name)
@@ -310,10 +319,13 @@ try:
         machine.freq(80000000)
     except:
         pass
-    sta_if.active(True)
-    print('Wifi activated')
-    sta_if.connect(auth.SSID_Name, auth.SSID_Pass)
-
+    try:
+        sta_if.active(True)
+        print('Wifi activated')
+        sta_if.connect(auth.SSID_Name, auth.SSID_Pass)
+    except:
+        machine.reset()
+        
     nextcalc = round(time.time_ns() / 1000000) + calc_interval
     while not sta_if.isconnected():
         timer = round(time.time_ns() / 1000000)
