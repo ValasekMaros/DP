@@ -47,7 +47,6 @@ try:
         "windDir_name": None,
         "windDir_ADC": None,
         "battery_voltage": None,
-        "status_wifimqtt": "OK",
         "status_ina219": "OK",
         "status_bme280": "OK",
         "status_dht22": "OK"
@@ -137,26 +136,15 @@ try:
                     spin = 0
                     break
         pinRain.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingRain)
-        break
 
     def countingWind(pin):
         print('Interupt...')
         global wind_lastMicros
         global wind_debounce_time
         global windSpeedTrigger
-        global nextcalc
-        global timer
         if round(time.time_ns() / 1000) - wind_lastMicros >= wind_debounce_time * 1000:
             windSpeedTrigger += 1
             wind_lastMicros = round(time.time_ns() / 1000)
-            break
-        
-        timer = round(time.time_ns() / 1000000)
-        #time.sleep(0.1)
-        if timer >= nextcalc:
-            pinWindSpeed.irq(None)
-            break
-        break
     # --------------------------------------------------------------------------------------------
     
     try:
@@ -276,8 +264,8 @@ try:
     pinRain_power.off()
     
     print('Start of Wind Speed Measurement')
-    nextcalc = round(time.time_ns() / 1000000) + calc_interval
     pinWindSpeed.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingWind)
+    nextcalc = round(time.time_ns() / 1000000) + calc_interval 
     while True:
         timer = round(time.time_ns() / 1000000)
         #time.sleep(0.1)
