@@ -384,9 +384,6 @@ try:
                     mqtt.disconnect()
                 except:
                     pass
-                endMainTime1 = time.time()
-                cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
-                print('Cycle time:', cycleTime)
                 rtcData["presses"] = rtcDataPresses
                 print('rtcDataPresses: ', rtcDataPresses)
                 try:
@@ -405,6 +402,9 @@ try:
                     machine.freq(20000000)
                 except:
                     pass
+                endMainTime1 = time.time()
+                cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
+                print('Cycle time:', cycleTime)
                 print('Sleep after message')
                 print((sendTime - cycleTime ) * 1000)
                 machine.lightsleep((sendTime - cycleTime ) * 1000)
