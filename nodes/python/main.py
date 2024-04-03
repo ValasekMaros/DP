@@ -149,7 +149,7 @@ try:
             windSpeedTrigger += 1
             wind_lastMicros = round(time.time_ns() / 1000)
         if timer >= nextcalc:
-            pinWindSpeed_power.off()
+            pinWindSpeed.irq(None)
             return
     # --------------------------------------------------------------------------------------------
     
