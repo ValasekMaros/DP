@@ -407,7 +407,7 @@ try:
                 print('Cycle time:', cycleTime)
                 print('Sleep after message')
                 print((sendTime - cycleTime ) * 1000)
-                machine.lightsleep((sendTime - cycleTime ) * 1000)
+                machine.lightsleep((sendTime - time.time()) * 1000)
                 while True:
                     spin += 1
                     time.sleep(0.1)
