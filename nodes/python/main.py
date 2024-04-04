@@ -199,7 +199,7 @@ try:
         #bmp180 = BMP180(I2C)
         #bmp180.oversample = 3
         #bmp180.sealevel = 1013
-        bme280 = BME280.BME280(mode=3, address=0x77, i2c=i2c)
+        bme280 = BME280.BME280(mode=5, address=0x77, i2c=i2c)
         #bmp180.makegauge()
     except OSError as e:
         print('Cant connect to BME280, error')
