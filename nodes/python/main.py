@@ -279,7 +279,7 @@ try:
         timer = round(time.time_ns() / 1000000)
         #time.sleep(0.1)
         if timer >= nextcalc:
-            pinWindSpeed_power.off()
+            pinWindSpeed.irq(None)
             print('Wind speed, measure interval: ',(timer - nextcalc) + calc_interval)
             print('Total Tips(Wind Speed):', windSpeedTrigger)
             try:
