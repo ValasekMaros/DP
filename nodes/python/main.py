@@ -424,11 +424,7 @@ try:
         machine.deepsleep((errorTime - cycleTime) * 1000)
         machine.reset()
     print('...main...')
-except Exception as E:
+except Exception as e:
     print('Error(Exception)...')
-    print(E)
-    machine.reset()
-except OSError as e:
-    print('Error(OSError)...')
     print(e)
     machine.reset()
