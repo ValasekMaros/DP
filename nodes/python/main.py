@@ -390,7 +390,6 @@ try:
                     rtc.memory(json.dumps(rtcData))
                 except:
                     pass
-                time.sleep(0.25)
                 rain_sleep = True
                 esp32.wake_on_ext0(pin = pinRain, level = esp32.WAKEUP_ALL_LOW)
                 try:
@@ -398,6 +397,7 @@ try:
                     sta_if.active(False)
                 except:
                     pass
+                time.sleep(0.25)
                 try:
                     machine.freq(20000000)
                 except:
