@@ -88,7 +88,10 @@ try:
     
     # --------------------------------------------------------------------------------------------
     # Pins
-    i2c = machine.I2C(0, scl=machine.Pin(22), sda=machine.Pin(21), freq=10000)
+    try:
+        i2c = machine.I2C(0, scl=machine.Pin(22), sda=machine.Pin(21), freq=10000)
+    except:
+        pass
     pinDHT = machine.Pin(23)
     pinRain = machine.Pin(34, machine.Pin.IN, machine.Pin.PULL_DOWN)
     pinWindSpeed = machine.Pin(15, machine.Pin.IN)
