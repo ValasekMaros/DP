@@ -63,8 +63,8 @@ try:
     topic_pub = 'project'
 
     calc_interval = 15000
-    rain_debounce_time = 150
-    wind_debounce_time = 80
+    rain_debounce_time = 80
+    wind_debounce_time = 15
     windDirCycle = 1
     windSpeedTrigger = 0
     windDir_deg = 0
