@@ -268,9 +268,9 @@ try:
     #message['bmp_press'] = press_bmp180
 
     #pinBMP_power.off()
-    pinBME_power.off()
-    pinDHT_power.off()
-    pinRain_power.off()
+    #pinBME_power.off()
+    #pinDHT_power.off()
+    #pinRain_power.off()
     
     print('Start of Wind Speed Measurement')
     nextcalc = round(time.time_ns() / 1000000) + calc_interval 
