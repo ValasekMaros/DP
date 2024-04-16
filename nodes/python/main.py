@@ -53,7 +53,7 @@ try:
         "status_dht22": "OK"
     }
     # Sleep time(in seconds) for sleep after error and sleep after successful message send, and for warming sensors
-    warmSensor = 30
+    warmSensor = 5
     errorTime = 300
     sendTime = 300
     # MQTT ID for connect
@@ -224,9 +224,7 @@ try:
         print('Connected to BME280')
         
         temp_bme280 = bme280.temperature
-        time.sleep(1)
         hum_bme280 = bme280.humidity
-        time.sleep(1)
         press_bme280 = bme280.pressure
         print('BME:', temp_bme280, hum_bme280, press_bme280)
         message['bme_temp'] = temp_bme280
@@ -270,9 +268,9 @@ try:
     #message['bmp_press'] = press_bmp180
 
     #pinBMP_power.off()
-    #pinBME_power.off()
-    #pinDHT_power.off()
-    #pinRain_power.off()
+    pinBME_power.off()
+    pinDHT_power.off()
+    pinRain_power.off()
     
     print('Start of Wind Speed Measurement')
     nextcalc = round(time.time_ns() / 1000000) + calc_interval 
