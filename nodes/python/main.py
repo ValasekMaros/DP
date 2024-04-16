@@ -64,7 +64,7 @@ try:
 
     calc_interval = 15000
     rain_debounce_time = 80
-    wind_debounce_time = 15
+    wind_debounce_time = 80
     windDirCycle = 1
     windSpeedTrigger = 0
     windDir_deg = 0
