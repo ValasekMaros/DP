@@ -53,7 +53,7 @@ try:
         "status_dht22": "OK"
     }
     # Sleep time(in seconds) for sleep after error and sleep after successful message send, and for warming sensors
-    warmSensor = 15
+    warmSensor = 30
     errorTime = 300
     sendTime = 300
     # MQTT ID for connect
