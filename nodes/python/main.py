@@ -413,9 +413,9 @@ try:
                 machine.lightsleep((sendTime - time.time()) * 1000)
                 while True:
                     spin += 1
-                    time.sleep(0.1)
+                    #time.sleep(0.1)
                     print('spin: ', spin)
-                    if spin > 15:
+                    if spin > 31:
                         spin = 0
                         machine.soft_reset()
     else:
