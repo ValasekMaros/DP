@@ -22,11 +22,12 @@ try:
     calc_interval = 15000
 
     sta_if = network.WLAN(network.STA_IF)
-
-    sta_if.active(True)
-    print('Wifi activated')
-    sta_if.connect(auth.SSID_Name, auth.SSID_Pass)
-
+    try:
+        sta_if.active(True)
+        print('Wifi activated')
+        sta_if.connect(auth.SSID_Name, auth.SSID_Pass)
+    except:
+        pass
     nextcalc = round(time.time_ns() / 1000000) + calc_interval
     while not sta_if.isconnected():
         timer = round(time.time_ns() / 1000000)
@@ -48,21 +49,16 @@ try:
 
     ota_updater.download_and_install_update_if_available()
 
-    sta_if.disconnect()
-    sta_if.active(False)
     try:
-        machine.freq(20000000)
+        sta_if.disconnect()
+        sta_if.active(False)
     except:
         pass
     endBootTime1 = time.time()
     bootTime = endBootTime1-startBootTime1
     print('Boot Time: ', bootTime)
     print('...boot...')
-except Exception as E:
+except Exception as e:
     print('Error(Exception)...')
-    print(E)
-    machine.reset()
-except OSError as e:
-    print('Error(OSError)...')
     print(e)
     machine.reset()
