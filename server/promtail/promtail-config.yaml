@@ -16,14 +16,6 @@ scrape_configs:
       job: varlogs
       __path__: /var/log/*log
 
-- job_name: mosquitto
-  static_configs:
-  - targets:
-      - localhost
-    labels:
-      job: mqtt
-      __path__: /var/log/mosquitto/*log
-
 - job_name: docker
   static_configs:
   - targets:
@@ -31,3 +23,11 @@ scrape_configs:
     labels:
       job: containers
       __path__: /var/lib/docker/containers/*/*log
+
+  - targets:
+      - localhost
+    labels:
+      job: mqtt
+      __path__: /var/log/mosquitto/*log
+
+
