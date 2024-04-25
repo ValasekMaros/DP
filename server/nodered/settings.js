@@ -88,7 +88,12 @@ module.exports = {
                 	"username": "pi",
                 	"password": "$2a$08$5wPVfdUlDDMsP8sluj29oe2KmJk3SnO2rqc7neiykAAqtaa6YGyeu",
                 	"permissions": "*"
-            	}
+            	},
+        	{
+            		"username": "budjacr",
+			"password": "$2b$08$UFAZPR70DeYX1Vh2whFbJePi0Gapk.BfJ0XQqHaS7cX4sAAcN9sXu",
+            		"permissions": "read"
+        	}
         	]
     	},
 
