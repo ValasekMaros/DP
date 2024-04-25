@@ -8,6 +8,8 @@ services:
     volumes:
       - /home/dp/project/mosquitto/config:/mosquitto/config
       - /home/dp/project/mosquitto/log:/mosquitto/log
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     ports:
       - 1883:1883
     restart: unless-stopped
@@ -19,6 +21,8 @@ services:
     container_name: nodered
     volumes:
       - /home/dp/project/nodered:/data
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     ports:
       - 1880:1880
     restart: unless-stopped
@@ -30,6 +34,8 @@ services:
     container_name: influxdb
     volumes:
       - /home/dp/project/influxdb:/var/lib/influxdb2
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     ports:
       - 8086:8086
     restart: unless-stopped
@@ -42,6 +48,9 @@ services:
     user: root
     volumes:
       - /home/dp/project/grafana:/var/lib/grafana
+      - /home/dp/project/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     ports:
       - 3000:3000
     restart: unless-stopped
@@ -53,6 +62,8 @@ services:
     container_name: loki
     volumes:
       - /home/dp/project/loki/loki-config.yaml:/etc/loki/loki-config.yaml
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     ports:
       - 3100:3100
     restart: unless-stopped
@@ -68,6 +79,8 @@ services:
       - /home/dp/project/mosquitto/log/:/var/log/mosquitto/
       - /var/lib/docker/containers:/var/lib/docker/containers
       - /home/dp/project/promtail/promtail-config.yaml:/etc/promtail/promtail-config.yaml
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     restart: unless-stopped
     command: -config.file=/etc/promtail/promtail-config.yaml
     networks:
