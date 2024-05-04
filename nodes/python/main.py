@@ -128,7 +128,7 @@ try:
                 pass
             else:
                 print('rtcData Saved')
-            time.sleep(1)
+            time.sleep(0.25)
             sleepTime = sendTime - time.time()
             pinRain.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingRain)
             esp32.wake_on_ext0(pin = pinRain, level = esp32.WAKEUP_ALL_LOW)
@@ -400,7 +400,7 @@ try:
                     sta_if.active(False)
                 except:
                     pass
-                time.sleep(0.25)
+                time.sleep(0.1)
                 try:
                     machine.freq(20000000)
                 except:
@@ -414,8 +414,8 @@ try:
                 while True:
                     spin += 1
                     #time.sleep(0.1)
-                    print('spin: ', spin)
-                    if spin > 31:
+                    #print('spin: ', spin)
+                    if spin > 16:
                         spin = 0
                         machine.soft_reset()
     else:
