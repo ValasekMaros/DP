@@ -56,6 +56,7 @@ try:
     warmSensor = 5
     errorTime = 30
     sendTime = 60
+    correctionTime = 1
     # MQTT ID for connect
     #mqtt_client = ubinascii.hexlify(machine.unique_id())
     mqtt_client = "MeteoStation00"
@@ -410,7 +411,7 @@ try:
                 print('Cycle time:', cycleTime)
                 print('Sleep after message')
                 print((sendTime - cycleTime ) * 1000)
-                machine.lightsleep((sendTime - time.time()) * 1000)
+                machine.lightsleep((sendTime - time.time() - correctionTime) * 1000)
                 while True:
                     spin += 1
                     #time.sleep(0.1)
