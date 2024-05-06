@@ -15,7 +15,7 @@ try:
     gc.collect()
     
     try:
-        machine.freq(80000000)
+        machine.freq(20000000)
     except:
         pass
     
@@ -403,7 +403,7 @@ try:
                     pass
                 time.sleep(0.1)
                 try:
-                    machine.freq(80000000)
+                    machine.freq(20000000)
                 except:
                     pass
                 endMainTime1 = time.time()
