@@ -54,9 +54,9 @@ try:
     }
     # Sleep time(in seconds) for sleep after error and sleep after successful message send, and for warming sensors
     warmSensor = 5
-    errorTime = 60
+    errorTime = 30
     sendTime = 60
-    correctionTime = 3
+    correctionTime = 1
     # MQTT ID for connect
     #mqtt_client = ubinascii.hexlify(machine.unique_id())
     mqtt_client = "MeteoStation00"
