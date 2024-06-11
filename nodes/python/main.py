@@ -53,7 +53,7 @@ try:
         "status_dht22": "OK"
     }
     # Sleep time(in seconds) for sleep after error and sleep after successful message send, and for warming sensors
-    warmSensor = 5
+    #warmSensor = 5
     errorTime = 30
     sendTime = 60
     correctionTime = 3
@@ -141,6 +141,7 @@ try:
                     spin = 0
                     break
         pinRain.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingRain)
+        return
 
     def countingWind(pin):
         print('Interupt...')
@@ -155,6 +156,7 @@ try:
         if timer >= nextcalc:
             pinWindSpeed.irq(None)
             return
+        return
     # --------------------------------------------------------------------------------------------
     
     try:
@@ -172,7 +174,52 @@ try:
     pinWindDir_power.on()
     pinRain_power.on()
     pinWindSpeed_power.on()
-    machine.lightsleep(warmSensor * 1000)
+    
+    nextcalc = round(time.time_ns() / 1000000) + calc_interval
+    windSpeedStart = 1
+    print('Start of Wind Speed Measurement')
+    while True:
+        if windSpeedStart:
+            pinWindSpeed.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingWind)
+            windSpeedStart = 0
+        timer = round(time.time_ns() / 1000000)
+        #time.sleep(0.1)
+        if timer >= nextcalc:
+            pinWindSpeed.irq(None)
+            print('Wind speed, measure interval: ',(timer - nextcalc) + calc_interval)
+            print('Total Tips(Wind Speed):', windSpeedTrigger)
+            try:
+                windSpeed_1Hz = windSpeedTrigger / calc_interval * 1000
+                message['windSpeed_tips'] = windSpeedTrigger
+                message['windSpeed_1Hz'] = windSpeed_1Hz
+                message['windSpeed_kmh'] = windSpeed_1Hz * 2.4
+                message['windSpeed_ms'] = (windSpeed_1Hz * 2.4) / 3.6
+            except:
+                pass
+            break
+    pinWindSpeed.irq(None)
+    print('End of Wind Speed Measurement')
+    
+    print('Start of Wind Direction Measurement')
+    pinWindDir_value = 0
+    for i in range(windDirCycle):
+        pinWindDir_value += pinWindDir.read()
+    pinWindDir_value /= windDirCycle
+    message['windDir_ADC'] = pinWindDir_value
+    for i in range(len(windDirDeg)):
+        if pinWindDir_value >= windDirMin[i] and pinWindDir_value <= windDirMax[i]:
+            windDir_deg = windDirDeg[i]
+            windDir_name = windDirName[i]
+            message['windDir_deg'] = windDir_deg
+            message['windDir_name'] = windDir_name
+            break
+    else:
+        message['windDir_deg'] = None
+        message['windDir_name'] = 'Error'
+    print('Wind Direction Deg:', windDir_deg)
+    print('Wind Direction Name:', windDir_name)
+    pinWindDir_power.off()
+    print('End of Wind Direction Measurement')
 
     try:
         sensor = ina219.INA219(i2c, addr=0x40)
@@ -225,7 +272,9 @@ try:
         print('Connected to BME280')
         
         temp_bme280 = bme280.temperature
+        time.sleep(1)
         hum_bme280 = bme280.humidity
+        time.sleep(1)
         press_bme280 = bme280.pressure
         print('BME:', temp_bme280, hum_bme280, press_bme280)
         message['bme_temp'] = temp_bme280
@@ -269,60 +318,15 @@ try:
     #message['bmp_press'] = press_bmp180
 
     #pinBMP_power.off()
-    pinBME_power.off()
+    #pinBME_power.off()
     pinDHT_power.off()
     pinRain_power.off()
-    
-    print('Start of Wind Speed Measurement')
-    nextcalc = round(time.time_ns() / 1000000) + calc_interval 
-    windSpeedStart = 1
-    while True:
-        if windSpeedStart:
-            pinWindSpeed.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingWind)
-            windSpeedStart = 0
-        timer = round(time.time_ns() / 1000000)
-        #time.sleep(0.1)
-        if timer >= nextcalc:
-            pinWindSpeed.irq(None)
-            print('Wind speed, measure interval: ',(timer - nextcalc) + calc_interval)
-            print('Total Tips(Wind Speed):', windSpeedTrigger)
-            try:
-                windSpeed_1Hz = windSpeedTrigger / calc_interval * 1000
-                message['windSpeed_tips'] = windSpeedTrigger
-                message['windSpeed_1Hz'] = windSpeed_1Hz
-                message['windSpeed_kmh'] = windSpeed_1Hz * 2.4
-                message['windSpeed_ms'] = (windSpeed_1Hz * 2.4) / 3.6
-            except:
-                pass
-            break
-    pinWindSpeed.irq(None)
-    print('End of Wind Speed Measurement')
-    
-    print('Start of Wind Direction Measurement')
-    pinWindDir_value = 0
-    for i in range(windDirCycle):
-        pinWindDir_value += pinWindDir.read()
-    pinWindDir_value /= windDirCycle
-    message['windDir_ADC'] = pinWindDir_value
-    for i in range(len(windDirDeg)):
-        if pinWindDir_value >= windDirMin[i] and pinWindDir_value <= windDirMax[i]:
-            windDir_deg = windDirDeg[i]
-            windDir_name = windDirName[i]
-            message['windDir_deg'] = windDir_deg
-            message['windDir_name'] = windDir_name
-            break
-    else:
-        message['windDir_deg'] = None
-        message['windDir_name'] = 'Error'
-    print('Wind Direction Deg:', windDir_deg)
-    print('Wind Direction Name:', windDir_name)
-    pinWindDir_power.off()
-    print('End of Wind Direction Measurement')
     
     try:
         machine.freq(80000000)
     except:
-        pass
+        machine.reset()
+        
     try:
         sta_if.active(True)
         print('Wifi activated')
@@ -370,9 +374,12 @@ try:
                     rtcDataPresses = 0
                 except:
                     pass
-                pinRain.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingRain)
-                print(message)
-                mqtt.publish(topic_pub, json.dumps(message), False, 1)
+                try:
+                    pinRain.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingRain)
+                    print(message)
+                    mqtt.publish(topic_pub, json.dumps(message), False, 1)
+                except:
+                    machine.reset()
             except OSError as e:
                 print('Problem with Publish, error')
                 print(e)
@@ -427,6 +434,7 @@ try:
         print('Error sleep')
         machine.deepsleep((errorTime - cycleTime) * 1000)
         machine.reset()
+        
     print('...main...')
 except Exception as e:
     print('Error(Exception)...')
