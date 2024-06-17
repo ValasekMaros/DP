@@ -174,52 +174,7 @@ try:
     pinWindDir_power.on()
     pinRain_power.on()
     pinWindSpeed_power.on()
-    
-    nextcalc = round(time.time_ns() / 1000000) + calc_interval
-    windSpeedStart = 1
-    print('Start of Wind Speed Measurement')
-    while True:
-        if windSpeedStart:
-            pinWindSpeed.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingWind)
-            windSpeedStart = 0
-        timer = round(time.time_ns() / 1000000)
-        #time.sleep(0.1)
-        if timer >= nextcalc:
-            pinWindSpeed.irq(None)
-            print('Wind speed, measure interval: ',(timer - nextcalc) + calc_interval)
-            print('Total Tips(Wind Speed):', windSpeedTrigger)
-            try:
-                windSpeed_1Hz = windSpeedTrigger / calc_interval * 1000
-                message['windSpeed_tips'] = windSpeedTrigger
-                message['windSpeed_1Hz'] = windSpeed_1Hz
-                message['windSpeed_kmh'] = windSpeed_1Hz * 2.4
-                message['windSpeed_ms'] = (windSpeed_1Hz * 2.4) / 3.6
-            except:
-                pass
-            break
-    pinWindSpeed.irq(None)
-    print('End of Wind Speed Measurement')
-    
-    print('Start of Wind Direction Measurement')
-    pinWindDir_value = 0
-    for i in range(windDirCycle):
-        pinWindDir_value += pinWindDir.read()
-    pinWindDir_value /= windDirCycle
-    message['windDir_ADC'] = pinWindDir_value
-    for i in range(len(windDirDeg)):
-        if pinWindDir_value >= windDirMin[i] and pinWindDir_value <= windDirMax[i]:
-            windDir_deg = windDirDeg[i]
-            windDir_name = windDirName[i]
-            message['windDir_deg'] = windDir_deg
-            message['windDir_name'] = windDir_name
-            break
-    else:
-        message['windDir_deg'] = None
-        message['windDir_name'] = 'Error'
-    print('Wind Direction Deg:', windDir_deg)
-    print('Wind Direction Name:', windDir_name)
-    pinWindDir_power.off()
-    print('End of Wind Direction Measurement')
+    time.sleep(1)
 
     try:
         sensor = ina219.INA219(i2c, addr=0x40)
@@ -321,6 +276,52 @@ try:
     pinBME_power.off()
     pinDHT_power.off()
     pinRain_power.off()
+    
+    nextcalc = round(time.time_ns() / 1000000) + calc_interval
+    windSpeedStart = 1
+    print('Start of Wind Speed Measurement')
+    while True:
+        if windSpeedStart:
+            pinWindSpeed.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingWind)
+            windSpeedStart = 0
+        timer = round(time.time_ns() / 1000000)
+        #time.sleep(0.1)
+        if timer >= nextcalc:
+            pinWindSpeed.irq(None)
+            print('Wind speed, measure interval: ',(timer - nextcalc) + calc_interval)
+            print('Total Tips(Wind Speed):', windSpeedTrigger)
+            try:
+                windSpeed_1Hz = windSpeedTrigger / calc_interval * 1000
+                message['windSpeed_tips'] = windSpeedTrigger
+                message['windSpeed_1Hz'] = windSpeed_1Hz
+                message['windSpeed_kmh'] = windSpeed_1Hz * 2.4
+                message['windSpeed_ms'] = (windSpeed_1Hz * 2.4) / 3.6
+            except:
+                pass
+            break
+    pinWindSpeed.irq(None)
+    print('End of Wind Speed Measurement')
+    
+    print('Start of Wind Direction Measurement')
+    pinWindDir_value = 0
+    for i in range(windDirCycle):
+        pinWindDir_value += pinWindDir.read()
+    pinWindDir_value /= windDirCycle
+    message['windDir_ADC'] = pinWindDir_value
+    for i in range(len(windDirDeg)):
+        if pinWindDir_value >= windDirMin[i] and pinWindDir_value <= windDirMax[i]:
+            windDir_deg = windDirDeg[i]
+            windDir_name = windDirName[i]
+            message['windDir_deg'] = windDir_deg
+            message['windDir_name'] = windDir_name
+            break
+    else:
+        message['windDir_deg'] = None
+        message['windDir_name'] = 'Error'
+    print('Wind Direction Deg:', windDir_deg)
+    print('Wind Direction Name:', windDir_name)
+    pinWindDir_power.off()
+    print('End of Wind Direction Measurement')
     
     try:
         machine.freq(80000000)
