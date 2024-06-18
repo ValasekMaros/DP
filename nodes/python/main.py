@@ -93,6 +93,9 @@ try:
         i2c = machine.I2C(0, scl=machine.Pin(22), sda=machine.Pin(21), freq=10000)
     except:
         pass
+    pinRain_power = machine.Pin(5, machine.Pin.OUT)
+    pinWindSpeed_power = machine.Pin(17, machine.Pin.OUT)
+    pinWindDir_power = machine.Pin(16, machine.Pin.OUT)
     pinDHT = machine.Pin(23)
     pinRain = machine.Pin(34, machine.Pin.IN, machine.Pin.PULL_DOWN)
     pinWindSpeed = machine.Pin(15, machine.Pin.IN)
@@ -103,15 +106,13 @@ try:
     pinBME_power = machine.Pin(19, machine.Pin.OUT)
     pinDHT_power = machine.Pin(18, machine.Pin.OUT)
 
-    pinRain_power = machine.Pin(5, machine.Pin.OUT)
-    pinWindSpeed_power = machine.Pin(17, machine.Pin.OUT)
-    pinWindDir_power = machine.Pin(16, machine.Pin.OUT)
-
     # --------------------------------------------------------------------------------------------
     # Functions
     def countingRain(pin):
         pinRain.irq(None)
-        print('Interupt...')
+        print('')
+        print('Rain Interupt...')
+        print('')
         global rain_lastMicros
         global rain_debounce_time
         global rain_sleep
@@ -330,6 +331,7 @@ try:
         
     try:
         sta_if.active(True)
+        sta_if.ifconfig((auth.device_IP, auth.mask, auth.gateway, auth.gateway))
         print('Wifi activated')
         sta_if.connect(auth.SSID_Name, auth.SSID_Pass)
     except:
@@ -367,20 +369,17 @@ try:
             try:
                 pinRain.irq(None)
                 print('Total Tips(Rain Gauge):', rtcDataPresses)
-                try:
-                    #print('rtcDataPresses: ', rtcDataPresses)
-                    #print('message["rain_tips"]: ', message['rain_tips'])
-                    message['rain_tips'] = rtcDataPresses
-                    message['rain_mm'] = rtcDataPresses * 0.2794
-                    rtcDataPresses = 0
-                except:
-                    pass
-                try:
-                    pinRain.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingRain)
-                    print(message)
-                    mqtt.publish(topic_pub, json.dumps(message), False, 1)
-                except:
-                    machine.reset()
+                #print('rtcDataPresses: ', rtcDataPresses)
+                #print('message["rain_tips"]: ', message['rain_tips'])
+                message['rain_tips'] = rtcDataPresses
+                message['rain_mm'] = rtcDataPresses * 0.2794
+                rtcDataPresses = 0
+                pinRain.irq(trigger=machine.Pin.IRQ_FALLING, handler=countingRain)
+            except:
+                pass
+            try:
+                print(message)
+                mqtt.publish(topic_pub, json.dumps(message), False, 1)
             except OSError as e:
                 print('Problem with Publish, error')
                 print(e)
