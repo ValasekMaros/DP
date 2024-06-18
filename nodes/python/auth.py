@@ -5,3 +5,7 @@ mqtt_host = ""
 mqtt_port = ""
 mqtt_user = ""
 mqtt_pass = ""
+
+device_IP = ""
+mask = ""
+gateway = ""
