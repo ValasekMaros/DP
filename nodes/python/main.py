@@ -172,9 +172,9 @@ try:
     #pinBMP_power.on()
     pinBME_power.on()
     pinDHT_power.on()
-    pinWindDir_power.off()
-    pinRain_power.off()
-    pinWindSpeed_power.off()
+    pinWindDir_power.on()
+    pinRain_power.on()
+    pinWindSpeed_power.on()
     time.sleep(1)
 
     try:
