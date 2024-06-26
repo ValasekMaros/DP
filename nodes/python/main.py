@@ -276,7 +276,9 @@ try:
     #pinBMP_power.off()
     pinBME_power.off()
     pinDHT_power.off()
+    pinWindDir_power.off()
     pinRain_power.off()
+    pinWindSpeed_power.off()
     
     nextcalc = round(time.time_ns() / 1000000) + calc_interval
     windSpeedStart = 1
