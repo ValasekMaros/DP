@@ -93,9 +93,9 @@ try:
         i2c = machine.I2C(0, scl=machine.Pin(22), sda=machine.Pin(21), freq=10000)
     except:
         pass
-    pinRain_power = machine.Pin(5, machine.Pin.OUT)
-    pinWindSpeed_power = machine.Pin(17, machine.Pin.OUT)
-    pinWindDir_power = machine.Pin(16, machine.Pin.OUT)
+    #pinRain_power = machine.Pin(5, machine.Pin.OUT)
+    #pinWindSpeed_power = machine.Pin(17, machine.Pin.OUT)
+    #pinWindDir_power = machine.Pin(16, machine.Pin.OUT)
     pinDHT = machine.Pin(23)
     pinRain = machine.Pin(34, machine.Pin.IN, machine.Pin.PULL_DOWN)
     pinWindSpeed = machine.Pin(15, machine.Pin.IN)
@@ -172,9 +172,9 @@ try:
     #pinBMP_power.on()
     pinBME_power.on()
     pinDHT_power.on()
-    pinWindDir_power.on()
-    pinRain_power.on()
-    pinWindSpeed_power.on()
+    #pinWindDir_power.on()
+    #pinRain_power.on()
+    #pinWindSpeed_power.on()
     time.sleep(1)
 
     try:
@@ -276,9 +276,9 @@ try:
     #pinBMP_power.off()
     pinBME_power.off()
     pinDHT_power.off()
-    pinWindDir_power.off()
-    pinRain_power.off()
-    pinWindSpeed_power.off()
+    #pinWindDir_power.off()
+    #pinRain_power.off()
+    #pinWindSpeed_power.off()
     
     nextcalc = round(time.time_ns() / 1000000) + calc_interval
     windSpeedStart = 1
@@ -323,7 +323,7 @@ try:
         message['windDir_name'] = 'Error'
     print('Wind Direction Deg:', windDir_deg)
     print('Wind Direction Name:', windDir_name)
-    pinWindDir_power.off()
+    #pinWindDir_power.off()
     print('End of Wind Direction Measurement')
     
     try:
