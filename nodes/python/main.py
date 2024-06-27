@@ -306,24 +306,28 @@ try:
     print('End of Wind Speed Measurement')
     
     print('Start of Wind Direction Measurement')
-    pinWindDir_value = 0
-    for i in range(windDirCycle):
-        pinWindDir_value += pinWindDir.read()
-    pinWindDir_value /= windDirCycle
-    message['windDir_ADC'] = pinWindDir_value
-    for i in range(len(windDirDeg)):
-        if pinWindDir_value >= windDirMin[i] and pinWindDir_value <= windDirMax[i]:
-            windDir_deg = windDirDeg[i]
-            windDir_name = windDirName[i]
-            message['windDir_deg'] = windDir_deg
-            message['windDir_name'] = windDir_name
-            break
-    else:
+    try:
+        pinWindDir_value = 0
+        for i in range(windDirCycle):
+            pinWindDir_value += pinWindDir.read()
+        pinWindDir_value /= windDirCycle
+        message['windDir_ADC'] = pinWindDir_value
+        for i in range(len(windDirDeg)):
+            if pinWindDir_value >= windDirMin[i] and pinWindDir_value <= windDirMax[i]:
+                windDir_deg = windDirDeg[i]
+                windDir_name = windDirName[i]
+                message['windDir_deg'] = windDir_deg
+                message['windDir_name'] = windDir_name
+                break
+        else:
+            message['windDir_deg'] = None
+            message['windDir_name'] = 'Error'
+        print('Wind Direction Deg:', windDir_deg)
+        print('Wind Direction Name:', windDir_name)
+        #pinWindDir_power.off()
+    except:
         message['windDir_deg'] = None
         message['windDir_name'] = 'Error'
-    print('Wind Direction Deg:', windDir_deg)
-    print('Wind Direction Name:', windDir_name)
-    #pinWindDir_power.off()
     print('End of Wind Direction Measurement')
     
     try:
