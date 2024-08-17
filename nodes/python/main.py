@@ -352,7 +352,7 @@ try:
             cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
             print('Cycle time:', cycleTime)
             print('Error sleep')
-            machine.deepsleep((errorTime - cycleTime) * 1000)
+            machine.deepsleep(errorTime * 1000)
             machine.reset()
             
     print('Connection successful')
@@ -369,7 +369,7 @@ try:
             cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
             print('Cycle time:', cycleTime)
             print('Error sleep')
-            machine.deepsleep((errorTime - cycleTime) * 1000)
+            machine.deepsleep(errorTime * 1000)
             machine.reset()
         else:
             try:
@@ -393,7 +393,7 @@ try:
                 cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
                 print('Cycle time:', cycleTime)
                 print('Error sleep')
-                machine.deepsleep((errorTime - cycleTime) * 1000)
+                machine.deepsleep(errorTime * 1000)
                 machine.reset()
             else:
                 print('Message send')
@@ -438,7 +438,7 @@ try:
         cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
         print('Cycle time:', cycleTime)
         print('Error sleep')
-        machine.deepsleep((errorTime - cycleTime) * 1000)
+        machine.deepsleep(errorTime * 1000)
         machine.reset()
         
     print('...main...')
