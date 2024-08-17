@@ -424,7 +424,11 @@ try:
                 print('Cycle time:', cycleTime)
                 print('Sleep after message')
                 print((sendTime - cycleTime ) * 1000)
-                machine.lightsleep(int((sendTime - time.time() - correctionTime) * 1000))
+                lightSleep = sendTime - cycleTime
+                if lightSleep > sendTime or lightSleep <= 0:
+                    machine.lightsleep((sendTime - correctionTime) * 1000)
+                else:
+                    machine.lightsleep(int((lightSleep - correctionTime) * 1000))
                 while True:
                     spin += 1
                     #time.sleep(0.1)
