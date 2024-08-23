@@ -320,13 +320,13 @@ try:
                 message['windDir_name'] = windDir_name
                 break
         else:
-            message['windDir_deg'] = 0
+            message['windDir_deg'] = None
             message['windDir_name'] = 'Error'
         print('Wind Direction Deg:', windDir_deg)
         print('Wind Direction Name:', windDir_name)
         #pinWindDir_power.off()
     except:
-        message['windDir_deg'] = 0
+        message['windDir_deg'] = None
         message['windDir_name'] = 'Error'
     print('End of Wind Direction Measurement')
     
