@@ -18,13 +18,13 @@ try:
     print('...boot...')
     startBootTime1 = time.time()
 
-    errorTime = 300
+    errorTime = 60
     calc_interval = 15000
 
     sta_if = network.WLAN(network.STA_IF)
     try:
         sta_if.active(True)
-        sta_if.ifconfig((auth.device_IP, auth.mask, auth.gateway, auth.gateway))
+        #sta_if.ifconfig((auth.device_IP, auth.mask, auth.gateway, auth.gateway))
         print('Wifi activated')
         sta_if.connect(auth.SSID_Name, auth.SSID_Pass)
     except:
@@ -34,11 +34,8 @@ try:
         timer = round(time.time_ns() / 1000000)
         if timer >= nextcalc:
             print('Cant connect to WiFi, error')
-            endTime = time.time()
-            cycleTime = endTime - startBootTime1
-            print('Cycle time:', cycleTime)
             print('Error sleep')
-            machine.deepsleep((errorTime - cycleTime) * 1000)
+            machine.deepsleep(errorTime * 1000)
             machine.reset()
 
     print('Connection successful')
