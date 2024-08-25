@@ -348,9 +348,6 @@ try:
         timer = round(time.time_ns() / 1000000)
         if timer >= nextcalc:
             print('Cant connect to WiFi, error')
-            endMainTime1 = time.time()
-            cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
-            print('Cycle time:', cycleTime)
             print('Error sleep')
             machine.deepsleep(errorTime * 1000)
             machine.reset()
@@ -365,9 +362,6 @@ try:
         except OSError as e:
             print('Problem with MQTT Connect, error')
             print(e)
-            endMainTime1 = time.time()
-            cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
-            print('Cycle time:', cycleTime)
             print('Error sleep')
             machine.deepsleep(errorTime * 1000)
             machine.reset()
@@ -389,9 +383,6 @@ try:
             except OSError as e:
                 print('Problem with Publish, error')
                 print(e)
-                endMainTime1 = time.time()
-                cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
-                print('Cycle time:', cycleTime)
                 print('Error sleep')
                 machine.deepsleep(errorTime * 1000)
                 machine.reset()
@@ -438,9 +429,6 @@ try:
                         machine.soft_reset()
     else:
         print('Cant connect to WiFi, error')
-        endMainTime1 = time.time()
-        cycleTime = (endMainTime1 - startMainTime1) + bootTime + importTime
-        print('Cycle time:', cycleTime)
         print('Error sleep')
         machine.deepsleep(errorTime * 1000)
         machine.reset()
