@@ -56,7 +56,7 @@ try:
     #warmSensor = 5
     errorTime = 60
     sendTime = 60
-    correctionTime = 3
+    correctionTime = 2
     # MQTT ID for connect
     #mqtt_client = ubinascii.hexlify(machine.unique_id())
     mqtt_client = "MeteoStation00"
