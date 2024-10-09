@@ -84,7 +84,7 @@ try:
     '''
     windDirMin = [2783, 1336, 1566, 167, 200, 104, 532, 320, 903, 746, 2371, 2045, 3723, 3224, 3278, 2579]
     windDirMax = [3223, 1565, 1885, 202, 245, 128, 650, 392, 1103, 901, 2578, 2370, 4334, 3277, 3722, 2782]
-    windDirDeg = [0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, 202.5, 225, 247.5, 270, 292.5, 315, 337.5]
+    windDirDeg = [360, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, 202.5, 225, 247.5, 270, 292.5, 315, 337.5]
     windDirName = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']
     
     # --------------------------------------------------------------------------------------------
@@ -320,13 +320,13 @@ try:
                 message['windDir_name'] = windDir_name
                 break
         else:
-            message['windDir_deg'] = None
+            message['windDir_deg'] = 0
             message['windDir_name'] = ''
         print('Wind Direction Deg:', windDir_deg)
         print('Wind Direction Name:', windDir_name)
         #pinWindDir_power.off()
     except:
-        message['windDir_deg'] = None
+        message['windDir_deg'] = 0
         message['windDir_name'] = ''
     print('End of Wind Direction Measurement')
     
