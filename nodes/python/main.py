@@ -47,6 +47,7 @@ try:
         "windDir_name": None,
         "windDir_ADC": None,
         "battery_voltage": None,
+        "rssi": None,
         "status_wifimqtt": "OK",
         "status_ina219": "OK",
         "status_bme280": "OK",
@@ -84,7 +85,7 @@ try:
     '''
     windDirMin = [2783, 1336, 1566, 167, 200, 104, 532, 320, 903, 746, 2371, 2045, 3723, 3224, 3278, 2579]
     windDirMax = [3223, 1565, 1885, 202, 245, 128, 650, 392, 1103, 901, 2578, 2370, 4334, 3277, 3722, 2782]
-    windDirDeg = [360, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, 202.5, 225, 247.5, 270, 292.5, 315, 337.5]
+    windDirDeg = [0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, 202.5, 225, 247.5, 270, 292.5, 315, 337.5]
     windDirName = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']
     
     # --------------------------------------------------------------------------------------------
@@ -320,13 +321,13 @@ try:
                 message['windDir_name'] = windDir_name
                 break
         else:
-            message['windDir_deg'] = 0
+            message['windDir_deg'] = None
             message['windDir_name'] = ''
         print('Wind Direction Deg:', windDir_deg)
         print('Wind Direction Name:', windDir_name)
         #pinWindDir_power.off()
     except:
-        message['windDir_deg'] = 0
+        message['windDir_deg'] = None
         message['windDir_name'] = ''
     print('End of Wind Direction Measurement')
     
@@ -338,6 +339,7 @@ try:
     try:
         sta_if.active(True)
         #sta_if.ifconfig((auth.device_IP, auth.mask, auth.gateway, auth.gateway))
+        sta_if.ifconfig()
         print('Wifi activated')
         sta_if.connect(auth.SSID_Name, auth.SSID_Pass)
     except:
@@ -356,6 +358,7 @@ try:
     print(sta_if.ifconfig())
 
     if sta_if.isconnected():
+        message['rssi'] = sta_if.status('rssi')
         try:
             mqtt = MQTTClient(mqtt_client, auth.mqtt_host, auth.mqtt_port, auth.mqtt_user, auth.mqtt_pass)
             mqtt.connect()
