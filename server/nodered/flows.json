@@ -8,9 +8,33 @@
         "env": []
     },
     {
+        "id": "96a2ad4f2349c94e",
+        "type": "tab",
+        "label": "Pool",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "e935873514d4c19f",
+        "type": "tab",
+        "label": "ZaKanalom",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "453c83f8481dbb4d",
+        "type": "tab",
+        "label": "RC Zahradka",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "99587b48e67a75ad",
         "type": "tab",
-        "label": "DP-Test",
+        "label": "Testing",
         "disabled": false,
         "info": "",
         "env": []
@@ -77,6 +101,45 @@
         "rejectUnauthorized": true
     },
     {
+        "id": "6cf3364d32981979",
+        "type": "influxdb",
+        "hostname": "127.0.0.1",
+        "port": "8086",
+        "protocol": "http",
+        "database": "database",
+        "name": "InfluxDB Pool",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "2.0",
+        "url": "http://influxdb:8086",
+        "timeout": "10",
+        "rejectUnauthorized": true
+    },
+    {
+        "id": "9777cbfca589e4b3",
+        "type": "websocket-client",
+        "path": "158.193.242.196:1880/",
+        "tls": "",
+        "wholemsg": "true",
+        "hb": "0",
+        "subprotocol": ""
+    },
+    {
+        "id": "b6822e669055c68d",
+        "type": "influxdb",
+        "hostname": "127.0.0.1",
+        "port": "8086",
+        "protocol": "http",
+        "database": "database",
+        "name": "InfluxDB RC Zahradka",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "2.0",
+        "url": "http://influxdb:8086",
+        "timeout": "10",
+        "rejectUnauthorized": true
+    },
+    {
         "id": "e4bcacc3334c7edb",
         "type": "mqtt in",
         "z": "96cdfc911e5f30a8",
@@ -89,11 +152,10 @@
         "rap": true,
         "rh": 0,
         "inputs": 0,
-        "x": 90,
-        "y": 600,
+        "x": 230,
+        "y": 540,
         "wires": [
             [
-                "fca26e21852167cb",
                 "9d44ec2f582d53a5",
                 "f766d64a5545da63",
                 "2e9eb97c1e75e9f5",
@@ -112,7 +174,9 @@
                 "f261e2dbfe39d13a",
                 "1be616957936bd3e",
                 "941c05395c5007c6",
-                "28e8f45914625fa4"
+                "28e8f45914625fa4",
+                "fca26e21852167cb",
+                "98c364b2ddabc504"
             ]
         ]
     },
@@ -201,7 +265,7 @@
         "id": "fca26e21852167cb",
         "type": "debug",
         "z": "96cdfc911e5f30a8",
-        "name": "debug - Message and Dew Point",
+        "name": "debug - Message",
         "active": true,
         "tosidebar": true,
         "console": false,
@@ -210,8 +274,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1050,
-        "y": 600,
+        "x": 830,
+        "y": 540,
         "wires": []
     },
     {
@@ -228,7 +292,7 @@
         "retentionPolicyV18Flux": "",
         "org": "project",
         "bucket": "sensors",
-        "x": 1030,
+        "x": 790,
         "y": 60,
         "wires": []
     },
@@ -246,7 +310,7 @@
         "retentionPolicyV18Flux": "",
         "org": "project",
         "bucket": "sensors",
-        "x": 1020,
+        "x": 780,
         "y": 160,
         "wires": []
     },
@@ -264,7 +328,7 @@
         "retentionPolicyV18Flux": "",
         "org": "project",
         "bucket": "sensors",
-        "x": 1020,
+        "x": 780,
         "y": 260,
         "wires": []
     },
@@ -282,7 +346,7 @@
         "retentionPolicyV18Flux": "",
         "org": "project",
         "bucket": "sensors",
-        "x": 1030,
+        "x": 790,
         "y": 640,
         "wires": []
     },
@@ -323,7 +387,7 @@
                 "t": "set",
                 "p": "payload",
                 "pt": "msg",
-                "to": "[\t   {\t       \"hPa\":msg.payload.bme_press\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation',\t        \"sensor\":'BME280'\t    }\t]",
+                "to": "[\t   {\t       \"hPa\":msg.payload.bme_press,\t       \"hPa_bmebmeSea\":(msg.payload.bme_press/$power(2.718281828,((-9.80665*0.0289644*345)/(8.31432*(273.15+msg.payload.bme_temp))))),\t       \"hPa_bmedhtSea\":(msg.payload.bme_press/$power(2.718281828,((-9.80665*0.0289644*345)/(8.31432*(273.15+msg.payload.bme_temp)))))\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation',\t        \"sensor\":'BME280'\t    }\t]",
                 "tot": "jsonata"
             }
         ],
@@ -336,7 +400,8 @@
         "y": 260,
         "wires": [
             [
-                "beb5e0ccdab79f3a"
+                "beb5e0ccdab79f3a",
+                "d25d134ecf315b69"
             ]
         ]
     },
@@ -377,7 +442,7 @@
                 "t": "set",
                 "p": "payload",
                 "pt": "msg",
-                "to": "[\t   {\t       \"adc\":msg.payload.windDir_ADC,\t       \"deg\":msg.payload.windDir_deg,\t       \"name\":msg.payload.windDir_name\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation',\t        \"sensor\":'WH-SP-WD'\t    }\t]",
+                "to": "[\t   {\t       \"adc\":msg.payload.windDir_ADC,\t       \"deg\":msg.payload.windDir_deg,\t       \"name\":msg.payload.windDir_name\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation',\t        \"sensor\":'WH-SP-WD',\t        \"direction\":msg.payload.windDir_deg\t    }\t]",
                 "tot": "jsonata"
             }
         ],
@@ -435,7 +500,7 @@
         "retentionPolicyV18Flux": "",
         "org": "project",
         "bucket": "sensors",
-        "x": 1020,
+        "x": 780,
         "y": 320,
         "wires": []
     },
@@ -453,7 +518,7 @@
         "retentionPolicyV18Flux": "",
         "org": "project",
         "bucket": "sensors",
-        "x": 1020,
+        "x": 780,
         "y": 380,
         "wires": []
     },
@@ -471,7 +536,7 @@
         "retentionPolicyV18Flux": "",
         "org": "project",
         "bucket": "sensors",
-        "x": 1010,
+        "x": 770,
         "y": 440,
         "wires": []
     },
@@ -498,8 +563,8 @@
         "y": 500,
         "wires": [
             [
-                "fca26e21852167cb",
-                "5df8ca37cd22d5d0"
+                "5df8ca37cd22d5d0",
+                "d25d134ecf315b69"
             ]
         ]
     },
@@ -517,7 +582,7 @@
         "retentionPolicyV18Flux": "",
         "org": "project",
         "bucket": "sensors",
-        "x": 1020,
+        "x": 780,
         "y": 500,
         "wires": []
     },
@@ -545,7 +610,7 @@
         "wires": [
             [
                 "5df8ca37cd22d5d0",
-                "fca26e21852167cb"
+                "d25d134ecf315b69"
             ]
         ]
     },
@@ -567,7 +632,7 @@
         "repair": false,
         "outputs": 1,
         "x": 470,
-        "y": 820,
+        "y": 920,
         "wires": [
             [
                 "0067d10e3c838531"
@@ -584,7 +649,7 @@
                 "t": "set",
                 "p": "payload",
                 "pt": "msg",
-                "to": "[\t   {\t       \"Volt\":msg.payload.battery_voltage,\t       \"Percent\": (100/1.5)*(msg.payload.battery_voltage-2.7)\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation',\t        \"sensor\":'INA219'\t    }\t]",
+                "to": "[\t   {\t       \"Volt\":msg.payload.battery_voltage,\t       \"Percent\": (100/0.9)*(msg.payload.battery_voltage-3.3)\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation',\t        \"sensor\":'INA219'\t    }\t]",
                 "tot": "jsonata"
             }
         ],
@@ -597,7 +662,8 @@
         "y": 640,
         "wires": [
             [
-                "107800ab4f5f7059"
+                "107800ab4f5f7059",
+                "d25d134ecf315b69"
             ]
         ]
     },
@@ -613,9 +679,9 @@
         "secure": true,
         "tls": true,
         "name": "projects.valasekm@gmail.com",
-        "dname": "",
-        "x": 1250,
-        "y": 940,
+        "dname": "Email Notification",
+        "x": 1130,
+        "y": 1020,
         "wires": []
     },
     {
@@ -636,7 +702,7 @@
         "payload": "{\"espID\":\"00\"}",
         "payloadType": "json",
         "x": 460,
-        "y": 860,
+        "y": 960,
         "wires": [
             [
                 "5d83d7a577c7972e",
@@ -663,7 +729,7 @@
         "repair": false,
         "outputs": 1,
         "x": 460,
-        "y": 920,
+        "y": 1013,
         "wires": [
             [
                 "2bdb208f5ef1f072"
@@ -688,7 +754,7 @@
         "repair": false,
         "outputs": 1,
         "x": 460,
-        "y": 980,
+        "y": 1073,
         "wires": [
             [
                 "ff455845a2d5803d"
@@ -713,7 +779,7 @@
         "repair": false,
         "outputs": 1,
         "x": 460,
-        "y": 1040,
+        "y": 1133,
         "wires": [
             [
                 "0ef68cb3c2993ada"
@@ -729,7 +795,7 @@
         "op2": "",
         "op1type": "str",
         "op2type": "pay",
-        "duration": "15",
+        "duration": "5",
         "extend": true,
         "overrideDelay": false,
         "units": "min",
@@ -738,12 +804,11 @@
         "topic": "topic",
         "outputs": 2,
         "x": 670,
-        "y": 820,
+        "y": 920,
         "wires": [
             [
                 "0c3bd4135d50b64e",
-                "12ad4ae3d6b41631",
-                "c8e4566f7df94c88"
+                "12ad4ae3d6b41631"
             ],
             [
                 "5d83d7a577c7972e",
@@ -764,8 +829,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 740,
-        "y": 740,
+        "x": 580,
+        "y": 860,
         "wires": []
     },
     {
@@ -781,8 +846,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1260,
-        "y": 1040,
+        "x": 1120,
+        "y": 1120,
         "wires": []
     },
     {
@@ -812,7 +877,7 @@
         "to": "",
         "reg": false,
         "x": 700,
-        "y": 920,
+        "y": 1013,
         "wires": [
             [
                 "c311a3068d634258",
@@ -847,7 +912,7 @@
         "to": "",
         "reg": false,
         "x": 690,
-        "y": 1040,
+        "y": 1133,
         "wires": [
             [
                 "c311a3068d634258",
@@ -882,7 +947,7 @@
         "to": "",
         "reg": false,
         "x": 700,
-        "y": 980,
+        "y": 1073,
         "wires": [
             [
                 "c311a3068d634258",
@@ -917,7 +982,7 @@
         "to": "",
         "reg": false,
         "x": 910,
-        "y": 860,
+        "y": 960,
         "wires": [
             [
                 "7f4f0dba7d8fde49"
@@ -944,7 +1009,7 @@
         "to": "",
         "reg": false,
         "x": 460,
-        "y": 700,
+        "y": 760,
         "wires": [
             [
                 "abaa693f45064b0a"
@@ -965,8 +1030,8 @@
         "retentionPolicyV18Flux": "",
         "org": "project",
         "bucket": "sensors",
-        "x": 1140,
-        "y": 700,
+        "x": 780,
+        "y": 760,
         "wires": []
     },
     {
@@ -984,10 +1049,10 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"espID\":\"00\",\"status_wifimqtt\":\"Error\"}",
+        "payload": "{\"espID\":\"00\",\"status_ina219\":\"Error\"}",
         "payloadType": "json",
-        "x": 150,
-        "y": 960,
+        "x": 170,
+        "y": 1040,
         "wires": [
             [
                 "2bdb208f5ef1f072",
@@ -1012,8 +1077,8 @@
         "topic": "",
         "payload": "{\"espID\":\"00\",\"status_bme280\":\"Error\"}",
         "payloadType": "json",
-        "x": 150,
-        "y": 1020,
+        "x": 170,
+        "y": 1100,
         "wires": [
             [
                 "ff455845a2d5803d",
@@ -1038,8 +1103,8 @@
         "topic": "",
         "payload": "{\"espID\":\"00\",\"status_dht22\":\"Error\"}",
         "payloadType": "json",
-        "x": 150,
-        "y": 1080,
+        "x": 170,
+        "y": 1160,
         "wires": [
             [
                 "0ef68cb3c2993ada",
@@ -1066,8 +1131,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1030,
-        "y": 820,
+        "x": 990,
+        "y": 920,
         "wires": [
             [
                 "abaa693f45064b0a"
@@ -1087,8 +1152,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1270,
-        "y": 1140,
+        "x": 1150,
+        "y": 1360,
         "wires": []
     },
     {
@@ -1117,8 +1182,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 970,
-        "y": 1140,
+        "x": 870,
+        "y": 1300,
         "wires": [
             [
                 "948dce635adb1660",
@@ -1139,7 +1204,7 @@
         "finalize": "",
         "libs": [],
         "x": 390,
-        "y": 1160,
+        "y": 1260,
         "wires": [
             [
                 "6a2ab7cc501334bc"
@@ -1162,7 +1227,7 @@
         "finalize": "",
         "libs": [],
         "x": 390,
-        "y": 1260,
+        "y": 1360,
         "wires": [
             [
                 "df448e40423708c2"
@@ -1189,7 +1254,7 @@
                 "t": "set",
                 "p": "payload",
                 "pt": "msg",
-                "to": "Notification: Wind speed is more than 10 m/s",
+                "to": "Notification: Wind speed is more than 5 m/s",
                 "tot": "str"
             }
         ],
@@ -1198,8 +1263,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 970,
-        "y": 1240,
+        "x": 870,
+        "y": 1340,
         "wires": [
             [
                 "948dce635adb1660",
@@ -1235,7 +1300,7 @@
         "repair": false,
         "outputs": 3,
         "x": 350,
-        "y": 1340,
+        "y": 1460,
         "wires": [
             [
                 "11efcdfadcbe3e35"
@@ -1275,7 +1340,7 @@
         "to": "",
         "reg": false,
         "x": 940,
-        "y": 1320,
+        "y": 1440,
         "wires": [
             [
                 "948dce635adb1660",
@@ -1310,7 +1375,7 @@
         "to": "",
         "reg": false,
         "x": 940,
-        "y": 1360,
+        "y": 1480,
         "wires": [
             [
                 "948dce635adb1660",
@@ -1335,8 +1400,8 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "x": 140,
-        "y": 1160,
+        "x": 160,
+        "y": 1300,
         "wires": [
             [
                 "1be616957936bd3e"
@@ -1360,8 +1425,8 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "x": 120,
-        "y": 1260,
+        "x": 140,
+        "y": 1380,
         "wires": [
             [
                 "941c05395c5007c6"
@@ -1385,8 +1450,8 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "x": 140,
-        "y": 1320,
+        "x": 160,
+        "y": 1440,
         "wires": [
             [
                 "28e8f45914625fa4"
@@ -1410,8 +1475,8 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "x": 130,
-        "y": 1360,
+        "x": 150,
+        "y": 1480,
         "wires": [
             [
                 "28e8f45914625fa4"
@@ -1424,23 +1489,24 @@
         "z": "96cdfc911e5f30a8",
         "name": "Send once 0mm reset",
         "op1": "",
-        "op2": "0",
+        "op2": "",
         "op1type": "pay",
         "op2type": "str",
-        "duration": "1",
+        "duration": "30",
         "extend": false,
         "overrideDelay": false,
-        "units": "hr",
+        "units": "min",
         "reset": "",
         "bytopic": "all",
         "topic": "topic",
-        "outputs": 1,
+        "outputs": 2,
         "x": 740,
-        "y": 1320,
+        "y": 1440,
         "wires": [
             [
                 "061a182e7c176b08"
-            ]
+            ],
+            []
         ]
     },
     {
@@ -1463,7 +1529,7 @@
         "to": "",
         "reg": false,
         "x": 500,
-        "y": 1380,
+        "y": 1500,
         "wires": [
             [
                 "8c49d0945925c4af"
@@ -1488,7 +1554,7 @@
         "topic": "topic",
         "outputs": 1,
         "x": 740,
-        "y": 1360,
+        "y": 1480,
         "wires": [
             [
                 "5490325d40d265c9"
@@ -1512,8 +1578,8 @@
         "bytopic": "all",
         "topic": "topic",
         "outputs": 1,
-        "x": 750,
-        "y": 1140,
+        "x": 670,
+        "y": 1240,
         "wires": [
             [
                 "46278a5b8a904061"
@@ -1539,8 +1605,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 580,
-        "y": 1180,
+        "x": 600,
+        "y": 1300,
         "wires": [
             [
                 "6a2ab7cc501334bc"
@@ -1573,8 +1639,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 950,
-        "y": 780,
+        "x": 910,
+        "y": 880,
         "wires": [
             [
                 "7f4f0dba7d8fde49"
@@ -1598,8 +1664,8 @@
         "bytopic": "all",
         "topic": "topic",
         "outputs": 1,
-        "x": 730,
-        "y": 1240,
+        "x": 650,
+        "y": 1340,
         "wires": [
             [
                 "7ded6c87dd5f4487"
@@ -1625,11 +1691,841 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 580,
-        "y": 1280,
+        "x": 600,
+        "y": 1400,
         "wires": [
             [
                 "df448e40423708c2"
+            ]
+        ]
+    },
+    {
+        "id": "d25d134ecf315b69",
+        "type": "debug",
+        "z": "96cdfc911e5f30a8",
+        "name": "debug - Calculation",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "98c364b2ddabc504",
+        "type": "change",
+        "z": "96cdfc911e5f30a8",
+        "name": "wifiRSSI",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"rssi\":msg.payload.rssi\t    },\t   {\t        \"espID\":msg.payload.espID,\t        \"place\":'meteostation',\t        \"sensor\":'WiFi'\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 440,
+        "y": 700,
+        "wires": [
+            [
+                "60b24923ac7d9fe3"
+            ]
+        ]
+    },
+    {
+        "id": "60b24923ac7d9fe3",
+        "type": "influxdb out",
+        "z": "96cdfc911e5f30a8",
+        "influxdb": "fc9141baac035642",
+        "name": "InfluxDB/wifiRSSI",
+        "measurement": "wifiRSSI",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "sensors",
+        "x": 770,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "2d53660f049d49cf",
+        "type": "mqtt in",
+        "z": "96a2ad4f2349c94e",
+        "name": "",
+        "topic": "Pool",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "de24aff89ea8a24b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 110,
+        "y": 60,
+        "wires": [
+            [
+                "defa3b1c7122389c",
+                "84aad706d2558518",
+                "95844daff895f0e9"
+            ]
+        ]
+    },
+    {
+        "id": "defa3b1c7122389c",
+        "type": "debug",
+        "z": "96a2ad4f2349c94e",
+        "name": "debug Pool",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 550,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "0269be96b983933d",
+        "type": "influxdb out",
+        "z": "96a2ad4f2349c94e",
+        "influxdb": "6cf3364d32981979",
+        "name": "Vzduch",
+        "measurement": "Air",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "Pool",
+        "x": 540,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "dc0ac893d242661b",
+        "type": "influxdb out",
+        "z": "96a2ad4f2349c94e",
+        "influxdb": "6cf3364d32981979",
+        "name": "Voda",
+        "measurement": "Water",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "Pool",
+        "x": 530,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "84aad706d2558518",
+        "type": "change",
+        "z": "96a2ad4f2349c94e",
+        "name": "Air",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"celsius\":msg.payload.vzduch\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 410,
+        "y": 100,
+        "wires": [
+            [
+                "0269be96b983933d"
+            ]
+        ]
+    },
+    {
+        "id": "95844daff895f0e9",
+        "type": "change",
+        "z": "96a2ad4f2349c94e",
+        "name": "Water",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"celsius\":msg.payload.voda\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 410,
+        "y": 140,
+        "wires": [
+            [
+                "dc0ac893d242661b"
+            ]
+        ]
+    },
+    {
+        "id": "e9242c0c25389583",
+        "type": "mqtt in",
+        "z": "e935873514d4c19f",
+        "name": "",
+        "topic": "ZaKanalom",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "de24aff89ea8a24b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 130,
+        "y": 60,
+        "wires": [
+            [
+                "1025f7e149c937ef",
+                "40a6e0f60d6fc6dc"
+            ]
+        ]
+    },
+    {
+        "id": "1025f7e149c937ef",
+        "type": "debug",
+        "z": "e935873514d4c19f",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 480,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "40a6e0f60d6fc6dc",
+        "type": "change",
+        "z": "e935873514d4c19f",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "msg.payload[0]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 320,
+        "y": 120,
+        "wires": [
+            [
+                "1025f7e149c937ef"
+            ]
+        ]
+    },
+    {
+        "id": "7d5ceb874be859d9",
+        "type": "http in",
+        "z": "453c83f8481dbb4d",
+        "name": "",
+        "url": "/weatherstation/updateweatherstation.php",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 200,
+        "y": 40,
+        "wires": [
+            [
+                "031479fbc143dfd3",
+                "cdfe9707d52ec6da",
+                "b5b6df6632a7c816",
+                "0375af91af16911b",
+                "c61c954d6e831280",
+                "d05c32f01b6aaebb",
+                "a83a0dacfd81b5a4",
+                "c67bee73577bd1d9",
+                "2b56d8f966d0282b",
+                "a4e0ad2f4a3681eb"
+            ]
+        ]
+    },
+    {
+        "id": "031479fbc143dfd3",
+        "type": "debug",
+        "z": "453c83f8481dbb4d",
+        "name": "Debug - RC Zahradka",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 780,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "376f08e36a24c4ba",
+        "type": "change",
+        "z": "453c83f8481dbb4d",
+        "name": "airTemperatureOLD",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"fahrenheitOUT\": $number(msg.payload.tempf),\t       \"fahrenheitIN\": $number(msg.payload.indoortempf)       \t    },\t   {\t       \"deviceID\":msg.payload.ID,\t       \"deviceLocation\":'rcZahradka',\t       \"sensor\":''\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 250,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "01098b4af4658519",
+        "type": "influxdb out",
+        "z": "453c83f8481dbb4d",
+        "influxdb": "b6822e669055c68d",
+        "name": "InfluxDB/airTemperature",
+        "measurement": "airTemperature",
+        "precision": "s",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "rcZahradka",
+        "x": 870,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "cdfe9707d52ec6da",
+        "type": "change",
+        "z": "453c83f8481dbb4d",
+        "name": "airHumidity",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"percentOUT\": $number(msg.payload.humidity),\t       \"percentIN\": $number(msg.payload.indoorhumidity)       \t    },\t   {\t       \"deviceID\":msg.payload.ID,\t       \"deviceLocation\":'rcZahradka',\t       \"sensor\":''\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 550,
+        "y": 140,
+        "wires": [
+            [
+                "7c389c3251534e11"
+            ]
+        ]
+    },
+    {
+        "id": "36d5e91bfd444bd9",
+        "type": "change",
+        "z": "453c83f8481dbb4d",
+        "name": "windSpeed/windGustOLD",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"speedmph\": $number(msg.payload.windspeedmph),\t       \"gustmph\": $number(msg.payload.windgustmph)\t    },\t   {\t        \"deviceID\":msg.payload.ID,\t        \"deviceLocation\":'rcZahradka',\t        \"sensor\":''\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 270,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ceb585168e12d152",
+        "type": "change",
+        "z": "453c83f8481dbb4d",
+        "name": "barominOLD",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"mercuryInch\": $number(msg.payload.baromin)\t    },\t   {\t        \"deviceID\":msg.payload.ID,\t        \"deviceLocation\":'rcZahradka',\t        \"sensor\":''\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 230,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b5b6df6632a7c816",
+        "type": "change",
+        "z": "453c83f8481dbb4d",
+        "name": "windDirection",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"deg\": $number(msg.payload.winddir)\t    },\t   {\t        \"deviceID\":msg.payload.ID,\t        \"deviceLocation\":'rcZahradka',\t        \"sensor\":''\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 560,
+        "y": 260,
+        "wires": [
+            [
+                "987922b15f9a304c"
+            ]
+        ]
+    },
+    {
+        "id": "ef2cbb35dd47afc4",
+        "type": "change",
+        "z": "453c83f8481dbb4d",
+        "name": "rainGaugeOLD",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"dailyinch\": $number(msg.payload.dailyrainin),\t       \"inch\": $number(msg.payload.rainin)\t    },\t   {\t        \"deviceID\":msg.payload.ID,\t        \"deviceLocation\":'rcZahradka',\t        \"sensor\":''\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 240,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "74e441570b07f4e0",
+        "type": "change",
+        "z": "453c83f8481dbb4d",
+        "name": "airDewPointOLD",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"fahrenheit\": $number(msg.payload.dewptf)\t    },\t   {\t        \"deviceID\":msg.payload.ID,\t        \"deviceLocation\":'rcZahradka',\t        \"sensor\":''\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 250,
+        "y": 340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a4e0ad2f4a3681eb",
+        "type": "change",
+        "z": "453c83f8481dbb4d",
+        "name": "UV",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"index\": $number(msg.payload.UV)\t    },\t   {\t        \"deviceID\":msg.payload.ID,\t        \"deviceLocation\":'rcZahradka',\t        \"sensor\":''\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 530,
+        "y": 380,
+        "wires": [
+            [
+                "cdf0032c95f4467c"
+            ]
+        ]
+    },
+    {
+        "id": "0375af91af16911b",
+        "type": "change",
+        "z": "453c83f8481dbb4d",
+        "name": "solarRadiation",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"watt/m2\": $number(msg.payload.solarradiation)\t    },\t   {\t        \"deviceID\":msg.payload.ID,\t        \"deviceLocation\":'rcZahradka',\t        \"sensor\":''\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 560,
+        "y": 420,
+        "wires": [
+            [
+                "97650499db9ea4f2"
+            ]
+        ]
+    },
+    {
+        "id": "7c389c3251534e11",
+        "type": "influxdb out",
+        "z": "453c83f8481dbb4d",
+        "influxdb": "b6822e669055c68d",
+        "name": "InfluxDB/airHumidity",
+        "measurement": "airHumidity",
+        "precision": "s",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "rcZahradka",
+        "x": 860,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "b3bcab6793ecc032",
+        "type": "influxdb out",
+        "z": "453c83f8481dbb4d",
+        "influxdb": "b6822e669055c68d",
+        "name": "InfluxDB/airSpeed/Gust",
+        "measurement": "airSpeed/Gust",
+        "precision": "s",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "rcZahradka",
+        "x": 870,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "f4b0f714eee062ab",
+        "type": "influxdb out",
+        "z": "453c83f8481dbb4d",
+        "influxdb": "b6822e669055c68d",
+        "name": "InfluxDB/airPressure",
+        "measurement": "airPressure",
+        "precision": "s",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "rcZahradka",
+        "x": 860,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "987922b15f9a304c",
+        "type": "influxdb out",
+        "z": "453c83f8481dbb4d",
+        "influxdb": "b6822e669055c68d",
+        "name": "InfluxDB/windDirection",
+        "measurement": "windDirection",
+        "precision": "s",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "rcZahradka",
+        "x": 860,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "05db5eda365880f2",
+        "type": "influxdb out",
+        "z": "453c83f8481dbb4d",
+        "influxdb": "b6822e669055c68d",
+        "name": "InfluxDB/rainGauge",
+        "measurement": "rainGauge",
+        "precision": "s",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "rcZahradka",
+        "x": 850,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "789cf1849310225e",
+        "type": "influxdb out",
+        "z": "453c83f8481dbb4d",
+        "influxdb": "b6822e669055c68d",
+        "name": "InfluxDB/airDewPoint",
+        "measurement": "airDewPoint",
+        "precision": "s",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "rcZahradka",
+        "x": 860,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "cdf0032c95f4467c",
+        "type": "influxdb out",
+        "z": "453c83f8481dbb4d",
+        "influxdb": "b6822e669055c68d",
+        "name": "InfluxDB/UV",
+        "measurement": "UV",
+        "precision": "s",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "rcZahradka",
+        "x": 830,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "97650499db9ea4f2",
+        "type": "influxdb out",
+        "z": "453c83f8481dbb4d",
+        "influxdb": "b6822e669055c68d",
+        "name": "InfluxDB/solarRadiation",
+        "measurement": "solarRadiation",
+        "precision": "s",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "project",
+        "bucket": "rcZahradka",
+        "x": 870,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "c61c954d6e831280",
+        "type": "change",
+        "z": "453c83f8481dbb4d",
+        "name": "airTemperature",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"fahrenheitOUT\": $number(msg.payload.tempf),\t       \"fahrenheitIN\": $number(msg.payload.indoortempf),\t       \"celsiusOUT\": ($number(msg.payload.tempf) - 32) / 1.8,\t       \"celsiusIN\": ($number(msg.payload.indoortempf) - 32) / 1.8       \t    },\t   {\t       \"deviceID\":msg.payload.ID,\t       \"deviceLocation\":'rcZahradka',\t       \"sensor\":''\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 560,
+        "y": 100,
+        "wires": [
+            [
+                "01098b4af4658519"
+            ]
+        ]
+    },
+    {
+        "id": "d05c32f01b6aaebb",
+        "type": "change",
+        "z": "453c83f8481dbb4d",
+        "name": "windSpeed/windGust",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"speedmph\": $number(msg.payload.windspeedmph),\t       \"gustmph\": $number(msg.payload.windgustmph),\t       \"speedkmh\": $number(msg.payload.windspeedmph) * 1.609344,\t       \"gustkmh\": $number(msg.payload.windgustmph) * 1.609344,\t       \"speedms\": $number(msg.payload.windspeedmph) * 0.44704,\t       \"gustms\": $number(msg.payload.windgustmph) * 0.44704 \t   },\t   {\t       \"deviceID\":msg.payload.ID,\t       \"deviceLocation\":'rcZahradka',\t       \"sensor\":'' \t   } \t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 180,
+        "wires": [
+            [
+                "b3bcab6793ecc032"
+            ]
+        ]
+    },
+    {
+        "id": "a83a0dacfd81b5a4",
+        "type": "change",
+        "z": "453c83f8481dbb4d",
+        "name": "baromin",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"mercuryInch\": $number(msg.payload.baromin),\t       \"hPa\": $number(msg.payload.baromin) * 33.863889\t    },\t   {\t        \"deviceID\":msg.payload.ID,\t        \"deviceLocation\":'rcZahradka',\t        \"sensor\":''\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 540,
+        "y": 220,
+        "wires": [
+            [
+                "f4b0f714eee062ab"
+            ]
+        ]
+    },
+    {
+        "id": "c67bee73577bd1d9",
+        "type": "change",
+        "z": "453c83f8481dbb4d",
+        "name": "rainGauge",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"dailyinch\": $number(msg.payload.dailyrainin),\t       \"inch\": $number(msg.payload.rainin),\t       \"dailymm\": $number(msg.payload.dailyrainin) * 25.4,\t       \"mm\": $number(msg.payload.rainin) * 25.4\t    },\t   {\t        \"deviceID\":msg.payload.ID,\t        \"deviceLocation\":'rcZahradka',\t        \"sensor\":''\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 550,
+        "y": 300,
+        "wires": [
+            [
+                "05db5eda365880f2"
+            ]
+        ]
+    },
+    {
+        "id": "2b56d8f966d0282b",
+        "type": "change",
+        "z": "453c83f8481dbb4d",
+        "name": "airDewPoint",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "[\t   {\t       \"fahrenheit\": $number(msg.payload.dewptf),\t       \"celsius\": ($number(msg.payload.dewptf) - 32) / 1.8\t    },\t   {\t        \"deviceID\":msg.payload.ID,\t        \"deviceLocation\":'rcZahradka',\t        \"sensor\":''\t    }\t]",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 550,
+        "y": 340,
+        "wires": [
+            [
+                "789cf1849310225e"
             ]
         ]
     },
@@ -1638,7 +2534,7 @@
         "type": "mqtt in",
         "z": "99587b48e67a75ad",
         "name": "",
-        "topic": "Test",
+        "topic": "DPTest",
         "qos": "1",
         "datatype": "auto-detect",
         "broker": "de24aff89ea8a24b",
@@ -1647,7 +2543,7 @@
         "rh": 0,
         "inputs": 0,
         "x": 50,
-        "y": 20,
+        "y": 160,
         "wires": [
             [
                 "268f513df21a4950",
@@ -1686,8 +2582,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 490,
-        "y": 60,
+        "x": 495,
+        "y": 200,
         "wires": [
             [
                 "56ff16e1613aa547"
@@ -1713,8 +2609,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 490,
-        "y": 100,
+        "x": 495,
+        "y": 240,
         "wires": [
             [
                 "56ff16e1613aa547"
@@ -1741,7 +2637,7 @@
         "to": "",
         "reg": false,
         "x": 480,
-        "y": 160,
+        "y": 280,
         "wires": [
             [
                 "5ebd7f175c08378e"
@@ -1760,8 +2656,8 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 980,
-        "y": 20,
+        "x": 985,
+        "y": 160,
         "wires": []
     },
     {
@@ -1778,8 +2674,8 @@
         "retentionPolicyV18Flux": "",
         "org": "project",
         "bucket": "test",
-        "x": 1030,
-        "y": 60,
+        "x": 1035,
+        "y": 200,
         "wires": []
     },
     {
@@ -1797,7 +2693,7 @@
         "org": "project",
         "bucket": "test",
         "x": 1020,
-        "y": 160,
+        "y": 280,
         "wires": []
     },
     {
@@ -1815,7 +2711,7 @@
         "org": "project",
         "bucket": "test",
         "x": 1020,
-        "y": 260,
+        "y": 380,
         "wires": []
     },
     {
@@ -1833,7 +2729,7 @@
         "org": "project",
         "bucket": "test",
         "x": 1010,
-        "y": 700,
+        "y": 820,
         "wires": []
     },
     {
@@ -1856,7 +2752,7 @@
         "to": "",
         "reg": false,
         "x": 480,
-        "y": 200,
+        "y": 320,
         "wires": [
             [
                 "5ebd7f175c08378e"
@@ -1883,7 +2779,7 @@
         "to": "",
         "reg": false,
         "x": 480,
-        "y": 260,
+        "y": 380,
         "wires": [
             [
                 "801e2f381949459a"
@@ -1910,7 +2806,7 @@
         "to": "",
         "reg": false,
         "x": 490,
-        "y": 320,
+        "y": 440,
         "wires": [
             [
                 "68756c1b542a2b29"
@@ -1937,7 +2833,7 @@
         "to": "",
         "reg": false,
         "x": 490,
-        "y": 380,
+        "y": 500,
         "wires": [
             [
                 "8d54a081b11941db"
@@ -1964,7 +2860,7 @@
         "to": "",
         "reg": false,
         "x": 500,
-        "y": 440,
+        "y": 560,
         "wires": [
             [
                 "7cd048707b5b2388"
@@ -1986,7 +2882,7 @@
         "org": "project",
         "bucket": "test",
         "x": 1020,
-        "y": 320,
+        "y": 440,
         "wires": []
     },
     {
@@ -2004,7 +2900,7 @@
         "org": "project",
         "bucket": "test",
         "x": 1020,
-        "y": 380,
+        "y": 500,
         "wires": []
     },
     {
@@ -2022,7 +2918,7 @@
         "org": "project",
         "bucket": "test",
         "x": 1010,
-        "y": 440,
+        "y": 560,
         "wires": []
     },
     {
@@ -2045,7 +2941,7 @@
         "to": "",
         "reg": false,
         "x": 480,
-        "y": 500,
+        "y": 620,
         "wires": [
             [
                 "268f513df21a4950",
@@ -2068,7 +2964,7 @@
         "org": "project",
         "bucket": "test",
         "x": 1020,
-        "y": 500,
+        "y": 620,
         "wires": []
     },
     {
@@ -2091,7 +2987,7 @@
         "to": "",
         "reg": false,
         "x": 480,
-        "y": 560,
+        "y": 680,
         "wires": [
             [
                 "268f513df21a4950",
@@ -2147,7 +3043,7 @@
         "repair": false,
         "outputs": 7,
         "x": 430,
-        "y": 700,
+        "y": 820,
         "wires": [
             [],
             [],
@@ -2171,7 +3067,7 @@
         "finalize": "",
         "libs": [],
         "x": 470,
-        "y": 780,
+        "y": 900,
         "wires": [
             [
                 "268f513df21a4950"
@@ -2193,7 +3089,7 @@
         "org": "project",
         "bucket": "test",
         "x": 1000,
-        "y": 620,
+        "y": 740,
         "wires": []
     },
     {
@@ -2216,7 +3112,7 @@
         "to": "",
         "reg": false,
         "x": 430,
-        "y": 620,
+        "y": 740,
         "wires": [
             [
                 "90c1df29459c6a9e"
@@ -2245,7 +3141,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 540,
-        "y": 860,
+        "y": 980,
         "wires": [
             [
                 "2baf506339bba1bb"
@@ -2270,11 +3166,48 @@
         "topic": "topic",
         "outputs": 1,
         "x": 740,
-        "y": 720,
+        "y": 840,
         "wires": [
             [
                 "268f513df21a4950"
             ]
         ]
+    },
+    {
+        "id": "c491c7a5e3af0b5e",
+        "type": "mqtt in",
+        "z": "99587b48e67a75ad",
+        "name": "",
+        "topic": "/Test",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "de24aff89ea8a24b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 50,
+        "y": 80,
+        "wires": [
+            [
+                "8b209fb70b5f70fe"
+            ]
+        ]
+    },
+    {
+        "id": "8b209fb70b5f70fe",
+        "type": "debug",
+        "z": "99587b48e67a75ad",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 220,
+        "y": 80,
+        "wires": []
     }
 ]

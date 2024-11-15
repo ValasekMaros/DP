@@ -41,9 +41,19 @@
         },
         "menu-menu-item-sidebar": true,
         "debug": {
-            "filter": "filterSelected",
-            "filteredNodes": []
+            "filter": "filterAll",
+            "filteredNodes": [
+                "268f513df21a4950",
+                "948dce635adb1660",
+                "fca26e21852167cb",
+                "c311a3068d634258",
+                "0c3bd4135d50b64e"
+            ],
+            "clearType": "filtered"
         },
-        "menu-menu-item-palette": true
+        "menu-menu-item-palette": true,
+        "menu-deploymenu-item-flow": false,
+        "menu-deploymenu-item-full": false,
+        "menu-deploymenu-item-node": true
     }
 }
